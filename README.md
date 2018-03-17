@@ -8,6 +8,7 @@
 
 
 ## Maven Repository
+[![pipeline status](https://gitlab.com/cubekrowd/mirror-simpleapi/badges/master/pipeline.svg)](https://gitlab.com/cubekrowd/mirror-simpleapi/commits/master)
 ```
     <repositories>
         <repository>
