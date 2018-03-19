@@ -12,6 +12,19 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>cubekrowd-repo</id>
+            <name>cubekrowd-public-releases</name>
+            <url>https://mavenrepo.cubekrowd.net/artifactory/public-release-local/</url>
+        </repository>
+        <snapshotRepository>
+            <id>cubekrowd-repo</id>
+            <name>cubekrowd-public-snapshots</name>
+            <url>https://mavenrepo.cubekrowd.net/artifactory/public-snapshot-local/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <finalName>${project.artifactId}</finalName>
         <resources>
@@ -35,6 +48,11 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
             </plugin>
         </plugins>
     </build>
