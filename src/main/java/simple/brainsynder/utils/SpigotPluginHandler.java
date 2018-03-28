@@ -29,10 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;
 
@@ -42,11 +39,11 @@ public class SpigotPluginHandler implements Listener {
     private boolean needsUpdate = false;
     private String version;
     private int id;
-    public static AdvMap<Plugin, SpigotPluginHandler> updaterMap = new AdvMap<>();
-    public static AdvMap<Plugin, String> verionMap = new AdvMap<>();
-    public static AdvMap<Plugin, Integer> IdMap = new AdvMap<>();
-    public static AdvMap<Plugin, String> authorMap = new AdvMap<>();
-    public static AdvMap<Plugin, String> pluginNameMap = new AdvMap<>();
+    public static Map<Plugin, SpigotPluginHandler> updaterMap = new HashMap<>();
+    public static Map<Plugin, String> verionMap = new HashMap<>();
+    public static Map<Plugin, Integer> IdMap = new HashMap<>();
+    public static Map<Plugin, String> authorMap = new HashMap<>();
+    public static Map<Plugin, String> pluginNameMap = new HashMap<>();
     private String downloads;
     private MetricType metricType = MetricType.NONE;
 
@@ -94,8 +91,6 @@ public class SpigotPluginHandler implements Listener {
         this.metricType = metricType;
         if (id != 0) {
             this.id = id;
-        }
-        if (id != 0) {
             System.out.println('[' + plugin.getDescription().getName() + "] Checking for updates...");
             if (plugin.getServer().getPluginManager().getPlugin("PerWorldPlugins") == null) {
                 loadMetrics();
@@ -299,17 +294,8 @@ public class SpigotPluginHandler implements Listener {
     private void loadMetrics() {
         if (metricType == MetricType.NONE)
             return;
-        if (metricType == MetricType.METRICS) {
-            try {
-                MetricsLite met = new MetricsLite(plugin);
-                met.enable();
-                System.out.println('[' + plugin.getDescription().getName() + "] loading Metrics...");
-            } catch (Exception ignored) {
-            }
-            return;
-        }
         if (metricType == MetricType.BSTATS) {
-            BStats met = new BStats(plugin);
+            new BStats(plugin);
             System.out.println('[' + plugin.getDescription().getName() + "] loading BStats...");
             System.out.println('[' + plugin.getDescription().getName() + "] BStats Location: https://bstats.org/plugin/bukkit/" + plugin.getDescription().getName().replace(" ", "%20"));
         }
@@ -372,7 +358,7 @@ public class SpigotPluginHandler implements Listener {
             System.out.println("SimpleAPI >> Plugin is not registered with SimpleAPI (SpigotPluginHandler class)");
             return new String[]{"Error"};
         }
-        SpigotPluginHandler handle = SpigotPluginHandler.updaterMap.getKey(plugin);
+        SpigotPluginHandler handle = SpigotPluginHandler.updaterMap.get(plugin);
         PluginUpdater updater = new PluginUpdater(plugin, handle.id, false);
         PluginUpdater.UpdateResult result = updater.getResult();
         String downloadURL = "https://spigotmc.org/resources/" + handle.id + '/';
@@ -433,7 +419,7 @@ public class SpigotPluginHandler implements Listener {
         }
 
         private void run() {
-            HANDLER_THREAD.submit(() -> {
+            CompletableFuture.runAsync(() -> {
                 try {
                     System.setProperty("http.agent", "Chrome");
                     URL url = new URL(VERSION_URL);
@@ -445,15 +431,25 @@ public class SpigotPluginHandler implements Listener {
                     InputStream inputStream = connection.getInputStream();
                     JSONArray versionsArray = (JSONArray) JSONValue.parseWithException(IOUtils.toString(inputStream));
                     String lastVersion = ((JSONObject) versionsArray.get(0)).get("name").toString();
-                    DOWNLOADS = ((JSONObject) versionsArray.get(0)).get("downloads").toString();
-                    if (shouldUpdate(PluginUpdater.this.oldVersion, lastVersion)) {
-                        PluginUpdater.this.version = lastVersion;
-                        PluginUpdater.this.result = UpdateResult.UPDATE_AVAILABLE;
-                    } else {
-                        PluginUpdater.this.result = UpdateResult.NO_UPDATE;
-                    }
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            DOWNLOADS = ((JSONObject) versionsArray.get(0)).get("downloads").toString();
+                            if (shouldUpdate(PluginUpdater.this.oldVersion, lastVersion)) {
+                                PluginUpdater.this.version = lastVersion;
+                                PluginUpdater.this.result = UpdateResult.UPDATE_AVAILABLE;
+                            } else {
+                                PluginUpdater.this.result = UpdateResult.NO_UPDATE;
+                            }
+                        }
+                    }.runTask(plugin);
                 } catch (Exception e) {
-                    PluginUpdater.this.result = UpdateResult.FAIL_SPIGOT;
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            PluginUpdater.this.result = UpdateResult.FAIL_SPIGOT;
+                        }
+                    }.runTask(plugin);
                 }
             });
         }
@@ -509,7 +505,6 @@ public class SpigotPluginHandler implements Listener {
          * @param plugin
          *         The plugin which stats should be submitted.
          */
-        @SneakyThrows
         public BStats(Plugin plugin) {
             if (plugin == null) {
                 throw new IllegalArgumentException("Plugin cannot be null!");
@@ -538,7 +533,9 @@ public class SpigotPluginHandler implements Listener {
                                 "This has nearly no effect on the server performance!\n" +
                                 "Check out https://bStats.org/ to learn more :)"
                 ).copyDefaults(true);
-                config.save(configFile);
+                try {
+                    config.save(configFile);
+                } catch (IOException e) {}
             }
 
             // Load the data

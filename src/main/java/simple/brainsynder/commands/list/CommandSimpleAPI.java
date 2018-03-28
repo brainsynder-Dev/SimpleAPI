@@ -3,7 +3,6 @@ package simple.brainsynder.commands.list;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import simple.brainsynder.Core;
 import simple.brainsynder.commands.BaseCommand;
@@ -27,8 +26,7 @@ public class CommandSimpleAPI extends BaseCommand {
         sender.sendMessage("§bSimpleAPI §9>> §7Looking for updates...");
         try {
             List<Boolean> updates = new ArrayList<>();
-            for (Plugin plugin : SpigotPluginHandler.updaterMap.keySet()) {
-                SpigotPluginHandler handle = SpigotPluginHandler.updaterMap.getKey(plugin);
+            SpigotPluginHandler.updaterMap.forEach((plugin, handle) -> {
                 if (handle.needsUpdate()) {
                     String downloadURL;
                     if (handle.getId() != 0) {
@@ -42,8 +40,8 @@ public class CommandSimpleAPI extends BaseCommand {
                     sender.sendMessage("§bSimpleAPI §9>> §7 Download at: " + downloadURL);
                     updates.add(true);
                 }
-            }
-            if (updates.size() == 0) {
+            });
+            if (updates.isEmpty()) {
                 sender.sendMessage("§bSimpleAPI §9>> §7All plugins using SimpleAPIs' updater are up to date");
             }
         }catch (Exception e) {
@@ -60,8 +58,7 @@ public class CommandSimpleAPI extends BaseCommand {
         player.sendMessage("§bSimpleAPI §9>> §7Looking for updates...");
         try {
             List<Boolean> updates = new ArrayList<>();
-            for (Plugin plugin : SpigotPluginHandler.updaterMap.keySet()) {
-                SpigotPluginHandler handle = SpigotPluginHandler.updaterMap.getKey(plugin);
+            SpigotPluginHandler.updaterMap.forEach((plugin, handle) -> {
                 PluginDescriptionFile pdf = handle.getPlugin().getDescription();
                 ITellraw tellraw = Reflection.getTellraw("§9• §b" + pdf.getName() + " >> Hover for more info");
                 tellraw.color(ChatColor.AQUA);
@@ -82,8 +79,8 @@ public class CommandSimpleAPI extends BaseCommand {
                     tellraw.send(player);
                     updates.add(true);
                 }
-            }
-            if (updates.size() == 0) {
+            });
+            if (updates.isEmpty()) {
                 player.sendMessage("§bSimpleAPI §9>> §7All plugins using SimpleAPIs' updater are up to date");
             }
         }catch (Exception e) {
