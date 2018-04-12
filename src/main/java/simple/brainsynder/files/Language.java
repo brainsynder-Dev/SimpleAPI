@@ -17,7 +17,6 @@ public class Language extends FileMaker{
     public static String NO_TEAM = "Scoreboard-Team-Unknown";
     public static String CHECK_UPDATES = "Check-For-Updates-On-Join";
     public static String API = "API-Only";
-    public static String NO_RECIPES = "NO-RECIPES";
     public static String NO_PARTICLE = "Particle-Not-Found";
     public static String INVALID_NUMBER = "Invalid-Number";
     public static String MISSING_OFFSETS = "Missing-Offset-Values";
@@ -48,7 +47,6 @@ public class Language extends FileMaker{
         set(true, COMMAND_LOG_ENABLED, true);
         set(true, CHECK_UPDATES, true, "Do you want the plugin to check for updates when", "a user logs onto the server (If they have permission)");
         set(true, API, false, "Do you want  the plugin to only be an API", "for the linked plugins? No new commands or Recipes and such");
-        set(true, NO_RECIPES, false, "Do you want the Custom Recipes to be disabled?");
         set(true, COMMAND_LOG, Arrays.asList(
                 "say",
                 "ban"

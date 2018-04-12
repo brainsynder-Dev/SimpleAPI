@@ -1,9 +1,6 @@
 package simple.brainsynder;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.plugin.java.JavaPlugin;
 import simple.brainsynder.api.ItemMaker;
 import simple.brainsynder.commands.list.*;
@@ -47,8 +44,6 @@ public class Core extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new LightDetector(), this);
             getServer().getPluginManager().registerEvents(new TexturefindListener(), this);
             getServer().getPluginManager().registerEvents(new CommandListener(), this);
-            if (!language.getBoolean(Language.NO_RECIPES))
-                loadReciepes();
         }
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
         lagCheck = new LagCheck();
@@ -66,16 +61,6 @@ public class Core extends JavaPlugin {
     
     public LagCheck getLagCheck() {
         return lagCheck;
-    }
-    
-    protected void loadReciepes() {
-        Bukkit.getServer().addRecipe(new ShapedRecipe(getTextureFinder().create())
-                .shape(" @ ", "@$@", " @ ")
-                .setIngredient('$', Material.STICK)
-                .setIngredient('@', Material.BONE));
-        Bukkit.getServer().addRecipe(new ShapelessRecipe(getLLDetector().create())
-                .addIngredient(Material.TORCH)
-                .addIngredient(Material.STICK));
     }
     
     public ItemMaker getLLDetector() {
