@@ -2,9 +2,11 @@ package simple.brainsynder.utils;
 
 public interface ILagChecker {
 
-    double getTicksPerSecond();
+    int getTicksPerSecond();
 
-    long getLastAverage ();
+    default long getLastAverage () {
+        return getTicksPerSecond();
+    }
 
     boolean isLagging();
 
