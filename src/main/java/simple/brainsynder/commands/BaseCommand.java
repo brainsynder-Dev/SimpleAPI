@@ -9,6 +9,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import simple.brainsynder.Core;
 import simple.brainsynder.files.Language;
 
+/**
+ * This will be removed some time in the future, please use the new command system
+ *
+ * {@link CommandRegistry}
+ */
+@Deprecated
 public abstract class BaseCommand implements CommandExecutor {
     @Getter private String commandName;
 
