@@ -29,8 +29,7 @@ public class WebConnector {
         return null;
     }
 
-    @Async @Cacheable(unit = TimeUnit.HOURS, asyncUpdate = true) @NonNull
-    public static Future<InputStream> getInputStream(String link) {
+    public static InputStream getInputStream(String link) {
         try {
             System.setProperty("http.agent", "Chrome");
             URL url = new URL(link);
@@ -41,7 +40,7 @@ public class WebConnector {
             connection.setReadTimeout(10000);
             connection.setDoInput(true);
             connection.setDoOutput(true);
-            return new CompletedFuture<>(connection.getInputStream());
+            return connection.getInputStream();
         } catch (Exception ignored) {}
         return null;
     }
