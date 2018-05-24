@@ -5,6 +5,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ *
+ * {@link List}
+ */
+@Deprecated
 public class Lore<T> implements Collection<T> {
     private List<T> list = new ArrayList<>();
 

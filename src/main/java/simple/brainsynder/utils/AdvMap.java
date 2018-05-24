@@ -15,7 +15,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/** This is my advanced version of a Map/HashMap */
+/**
+ * This is my advanced version of a Map/HashMap
+ *
+ * {@link Map}
+ */
+@Deprecated
 public class AdvMap <KeyType, ValueType> {
 	private Map<KeyType, ValueType> KMap = new HashMap<> ();
 	private Map<ValueType, KeyType> VMap = new HashMap<> ();
