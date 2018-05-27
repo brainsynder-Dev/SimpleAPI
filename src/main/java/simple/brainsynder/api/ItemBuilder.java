@@ -6,10 +6,12 @@ import com.mojang.authlib.properties.PropertyMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.material.MaterialData;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,6 +38,39 @@ public class ItemBuilder {
         if (amount != 1) JSON.put("amount", amount);
         this.is = new ItemStack(material, amount);
         this.im = is.getItemMeta();
+    }
+
+    public static ItemBuilder fromItem (ItemStack stack) {
+        ItemBuilder builder = new ItemBuilder(stack.getType(), stack.getAmount());
+        if (stack.getData() != null) builder.withData(stack.getData().getData());
+        if (stack.hasItemMeta()) {
+            ItemMeta meta = stack.getItemMeta();
+            if (meta.hasDisplayName()) builder.withName(meta.getDisplayName());
+            if (meta.hasEnchants()) {
+                meta.getEnchants().forEach((enchantment, integer) -> {
+                    builder.withEnchant(enchantment, integer);
+                });
+            }
+            if (meta.hasLore()) builder.withLore(meta.getLore());
+            if (!meta.getItemFlags().isEmpty()) {
+                meta.getItemFlags().forEach(itemFlag -> {
+                    builder.withFlag(itemFlag);
+                });
+            }
+
+            if (meta instanceof SkullMeta) {
+                SkullMeta skull = (SkullMeta) meta;
+                if (skull.hasOwner()) builder.setOwner(skull.getOwner());
+                String texture = builder.getTexture(builder.getGameProfile(skull));
+                if (!texture.isEmpty()) builder.setTexture(texture);
+            }
+
+            if (meta instanceof SpawnEggMeta) {
+                SpawnEggMeta egg = (SpawnEggMeta)meta;
+                if (egg.getSpawnedType() != null) builder.withEntity(egg.getSpawnedType());
+            }
+        }
+        return builder;
     }
 
     public static ItemBuilder fromJSON (JSONObject json) {
@@ -72,6 +107,8 @@ public class ItemBuilder {
                 builder.withFlag(flag);
             }
         }
+        if (json.containsKey("entity"))
+            builder.withEntity(EntityType.valueOf(String.valueOf(json.get("entity"))));
 
         if (json.containsKey("skullData")) {
             JSONObject skull = (JSONObject) json.get("skullData");
@@ -90,6 +127,18 @@ public class ItemBuilder {
     public ItemBuilder withName(String name) {
         JSON.put("name", name);
         im.setDisplayName(translate(name));
+        return this;
+    }
+
+    public ItemBuilder withEntity(EntityType type) {
+        JSON.put("entity", type.name());
+
+        if (is.getType() == Material.MONSTER_EGG) {
+            SpawnEggMeta spawnEggMeta = (SpawnEggMeta) im;
+            spawnEggMeta.setSpawnedType(type);
+            im = spawnEggMeta;
+        }
+
         return this;
     }
 
@@ -142,7 +191,6 @@ public class ItemBuilder {
         is.setDurability((short) data);
         return this;
     }
-
     public ItemBuilder withData (MaterialData data) {
         // Checks from the Bukkit API - Start
         Material mat = is.getType();
@@ -213,7 +261,6 @@ public class ItemBuilder {
     public JSONObject toJSON () {
         return JSON;
     }
-
     public ItemStack build() {
         is.setItemMeta(im);
         return is;
@@ -284,6 +331,12 @@ public class ItemBuilder {
                     }catch (Exception ignored) {}
                 }
 
+                if ((mainMeta instanceof SpawnEggMeta) && (checkMeta instanceof SpawnEggMeta)) {
+                    SpawnEggMeta mainSkullMeta = (SpawnEggMeta) mainMeta;
+                    SpawnEggMeta checkSkullMeta = (SpawnEggMeta) checkMeta;
+                    values.add(mainSkullMeta.getSpawnedType() == checkSkullMeta.getSpawnedType());
+                }
+
                 if (!values.isEmpty()) return !values.contains(false);
             }
         }
@@ -299,7 +352,6 @@ public class ItemBuilder {
         message.forEach(msg -> newLore.add(translate(msg)));
         return newLore;
     }
-
     private GameProfile createProfile(String data) {
         Valid.notNull(data, "data can not be null");
 
@@ -315,7 +367,6 @@ public class ItemBuilder {
             return null;
         }
     }
-
     private SkullMeta applyTextureToMeta(SkullMeta meta, GameProfile profile) {
         Valid.notNull(meta, "meta cannot be null");
         Valid.notNull(profile, "profile cannot be null");
@@ -325,7 +376,6 @@ public class ItemBuilder {
         field.set(meta, profile);
         return meta;
     }
-
     private GameProfile getGameProfile(SkullMeta meta) {
         Valid.notNull(meta, "meta cannot be null");
         Class craftMetaSkull = Reflection.getCBCClass("inventory.CraftMetaSkull");
@@ -333,7 +383,6 @@ public class ItemBuilder {
         FieldAccessor<GameProfile> field = FieldAccessor.getField(c, "profile", GameProfile.class);
         return field.get(meta);
     }
-
     private String getTexture (GameProfile profile) {
         PropertyMap propertyMap = profile.getProperties();
         Collection<Property> properties = propertyMap.get("textures");
