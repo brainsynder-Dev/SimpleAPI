@@ -126,16 +126,11 @@ public class SpigotPluginHandler implements Listener {
     /**
      * This will also add your plugin to mcstats.org It will use your plugins name as the name to add.
      *
-     * @param plugin
-     *         Your plugins instance
-     * @param author
-     *         (Can be null now) Author in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
-     * @param version
-     *         (Can be null now) Version of the plugin in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
-     * @param name
-     *         (Can be null now) Name of the plugin in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
-     * @param id
-     *         Spigot id (Look at your plugins spigot link the id is like this["spigotmc.org/resources/plugin.ID"]) If you do not know your spigot plugin id then use 0
+     * @param plugin  Your plugins instance
+     * @param author  (Can be null now) Author in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
+     * @param version (Can be null now) Version of the plugin in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
+     * @param name    (Can be null now) Name of the plugin in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
+     * @param id      Spigot id (Look at your plugins spigot link the id is like this["spigotmc.org/resources/plugin.ID"]) If you do not know your spigot plugin id then use 0
      */
     public static void registerPlugin(Plugin plugin, String author, String version, String name, int id) {
         SpigotPluginHandler handler = new SpigotPluginHandler(plugin, id, true);
@@ -180,18 +175,12 @@ public class SpigotPluginHandler implements Listener {
     /**
      * This will also add your plugin to mcstats.org It will use your plugins name as the name to add.
      *
-     * @param plugin
-     *         Your plugins instance
-     * @param author
-     *         (Can be null now) Author in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
-     * @param version
-     *         (Can be null now) Version of the plugin in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
-     * @param name
-     *         (Can be null now) Name of the plugin in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
-     * @param id
-     *         Spigot id (Look at your plugins spigot link the id is like this["spigotmc.org/resources/plugin.ID"]) If you do not know your spigot plugin id then use 0
-     * @param metrics
-     *         Do you want to make your plugin use metrics?
+     * @param plugin  Your plugins instance
+     * @param author  (Can be null now) Author in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
+     * @param version (Can be null now) Version of the plugin in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
+     * @param name    (Can be null now) Name of the plugin in the plugin.yml (Must have to work with the Tamper checking of the plugin.yml)
+     * @param id      Spigot id (Look at your plugins spigot link the id is like this["spigotmc.org/resources/plugin.ID"]) If you do not know your spigot plugin id then use 0
+     * @param metrics Do you want to make your plugin use metrics?
      */
     public static void registerPlugin(Plugin plugin, String author, String version, String name, int id, boolean metrics) {
         SpigotPluginHandler handler = new SpigotPluginHandler(plugin, id, metrics);
@@ -327,6 +316,36 @@ public class SpigotPluginHandler implements Listener {
         }.runTaskLaterAsynchronously(plugin, 20 * 60 * 10);
     }
 
+    public void needsUpdate (UpdateValue value) {
+        CompletableFuture.runAsync(() -> {
+            boolean update = false;
+            String version = "";
+            PluginUpdater updater = new PluginUpdater(plugin, id, false);
+            PluginUpdater.UpdateResult result = updater.getResult();
+            switch (result) {
+                case UPDATE_AVAILABLE: {
+                    if (!needsUpdate) {
+                        version = updater.getVersion();
+                        update = true;
+                    }
+                }
+            }
+
+            String finalVersion = version;
+            boolean finalUpdate = update;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    value.run(finalUpdate, finalVersion);
+                }
+            }.runTask(plugin);
+        });
+    }
+
+    public interface UpdateValue {
+        void run (boolean needsUpdate, String version);
+    }
+
     public boolean needsUpdate() {
         if (id == 0) {
             version = "0.2";
@@ -419,39 +438,27 @@ public class SpigotPluginHandler implements Listener {
         }
 
         private void run() {
-            CompletableFuture.runAsync(() -> {
-                try {
-                    System.setProperty("http.agent", "Chrome");
-                    URL url = new URL(VERSION_URL);
-                    URLConnection connection = url.openConnection();
-                    connection.addRequestProperty("User-Agent", "Mozilla/5.0");
-                    connection.setConnectTimeout(5000);
-                    connection.setReadTimeout(5000);
-                    connection.setUseCaches(false);
-                    InputStream inputStream = connection.getInputStream();
-                    JSONArray versionsArray = (JSONArray) JSONValue.parseWithException(IOUtils.toString(inputStream));
-                    String lastVersion = ((JSONObject) versionsArray.get(0)).get("name").toString();
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            DOWNLOADS = ((JSONObject) versionsArray.get(0)).get("downloads").toString();
-                            if (shouldUpdate(PluginUpdater.this.oldVersion, lastVersion)) {
-                                PluginUpdater.this.version = lastVersion;
-                                PluginUpdater.this.result = UpdateResult.UPDATE_AVAILABLE;
-                            } else {
-                                PluginUpdater.this.result = UpdateResult.NO_UPDATE;
-                            }
-                        }
-                    }.runTask(plugin);
-                } catch (Exception e) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            PluginUpdater.this.result = UpdateResult.FAIL_SPIGOT;
-                        }
-                    }.runTask(plugin);
+            try {
+                System.setProperty("http.agent", "Chrome");
+                URL url = new URL(VERSION_URL);
+                URLConnection connection = url.openConnection();
+                connection.addRequestProperty("User-Agent", "Mozilla/5.0");
+                connection.setConnectTimeout(5000);
+                connection.setReadTimeout(5000);
+                connection.setUseCaches(false);
+                InputStream inputStream = connection.getInputStream();
+                JSONArray versionsArray = (JSONArray) JSONValue.parseWithException(IOUtils.toString(inputStream));
+                String lastVersion = ((JSONObject) versionsArray.get(0)).get("name").toString();
+                DOWNLOADS = ((JSONObject) versionsArray.get(0)).get("downloads").toString();
+                if (shouldUpdate(PluginUpdater.this.oldVersion, lastVersion)) {
+                    PluginUpdater.this.version = lastVersion;
+                    PluginUpdater.this.result = UpdateResult.UPDATE_AVAILABLE;
+                } else {
+                    PluginUpdater.this.result = UpdateResult.NO_UPDATE;
                 }
-            });
+            } catch (Exception e) {
+                PluginUpdater.this.result = UpdateResult.FAIL_SPIGOT;
+            }
         }
 
         private void versionCheck() {
@@ -479,6 +486,7 @@ public class SpigotPluginHandler implements Listener {
         }
 
     }
+
     private static class BStats {
 
         // The version of this bStats class
@@ -502,8 +510,7 @@ public class SpigotPluginHandler implements Listener {
         /**
          * Class constructor.
          *
-         * @param plugin
-         *         The plugin which stats should be submitted.
+         * @param plugin The plugin which stats should be submitted.
          */
         public BStats(Plugin plugin) {
             if (plugin == null) {
@@ -535,7 +542,8 @@ public class SpigotPluginHandler implements Listener {
                 ).copyDefaults(true);
                 try {
                     config.save(configFile);
-                } catch (IOException e) {}
+                } catch (IOException e) {
+                }
             }
 
             // Load the data
@@ -564,8 +572,7 @@ public class SpigotPluginHandler implements Listener {
         /**
          * Adds a custom chart.
          *
-         * @param chart
-         *         The chart to add.
+         * @param chart The chart to add.
          */
         public void addCustomChart(CustomChart chart) {
             if (chart == null) {
@@ -701,11 +708,8 @@ public class SpigotPluginHandler implements Listener {
         /**
          * Sends the data to the bStats server.
          *
-         * @param data
-         *         The data to send.
-         *
-         * @throws Exception
-         *         If the request failed.
+         * @param data The data to send.
+         * @throws Exception If the request failed.
          */
         private static void sendData(JSONObject data) throws Exception {
             if (data == null) {
@@ -742,13 +746,9 @@ public class SpigotPluginHandler implements Listener {
         /**
          * Gzips the given String.
          *
-         * @param str
-         *         The string to gzip.
-         *
+         * @param str The string to gzip.
          * @return The gzipped String.
-         *
-         * @throws IOException
-         *         If the compression failed.
+         * @throws IOException If the compression failed.
          */
         private static byte[] compress(final String str) throws IOException {
             if (str == null) {
@@ -772,8 +772,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public CustomChart(String chartId) {
                 if (chartId == null || chartId.isEmpty()) {
@@ -813,8 +812,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public SimplePie(String chartId) {
                 super(chartId);
@@ -848,8 +846,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public AdvancedPie(String chartId) {
                 super(chartId);
@@ -858,10 +855,8 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Gets the values of the pie.
              *
-             * @param valueMap
-             *         Just an empty map. The only reason it exists is to make your life easier.
-             *         You don't have to create a map yourself!
-             *
+             * @param valueMap Just an empty map. The only reason it exists is to make your life easier.
+             *                 You don't have to create a map yourself!
              * @return The values of the pie.
              */
             public abstract HashMap<String, Integer> getValues(HashMap<String, Integer> valueMap);
@@ -900,8 +895,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public SingleLineChart(String chartId) {
                 super(chartId);
@@ -936,8 +930,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public MultiLineChart(String chartId) {
                 super(chartId);
@@ -946,10 +939,8 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Gets the values of the chart.
              *
-             * @param valueMap
-             *         Just an empty map. The only reason it exists is to make your life easier.
-             *         You don't have to create a map yourself!
-             *
+             * @param valueMap Just an empty map. The only reason it exists is to make your life easier.
+             *                 You don't have to create a map yourself!
              * @return The values of the chart.
              */
             public abstract HashMap<String, Integer> getValues(HashMap<String, Integer> valueMap);
@@ -989,8 +980,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public SimpleBarChart(String chartId) {
                 super(chartId);
@@ -999,10 +989,8 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Gets the value of the chart.
              *
-             * @param valueMap
-             *         Just an empty map. The only reason it exists is to make your life easier.
-             *         You don't have to create a map yourself!
-             *
+             * @param valueMap Just an empty map. The only reason it exists is to make your life easier.
+             *                 You don't have to create a map yourself!
              * @return The value of the chart.
              */
             public abstract HashMap<String, Integer> getValues(HashMap<String, Integer> valueMap);
@@ -1035,8 +1023,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public AdvancedBarChart(String chartId) {
                 super(chartId);
@@ -1045,10 +1032,8 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Gets the value of the chart.
              *
-             * @param valueMap
-             *         Just an empty map. The only reason it exists is to make your life easier.
-             *         You don't have to create a map yourself!
-             *
+             * @param valueMap Just an empty map. The only reason it exists is to make your life easier.
+             *                 You don't have to create a map yourself!
              * @return The value of the chart.
              */
             public abstract HashMap<String, int[]> getValues(HashMap<String, int[]> valueMap);
@@ -1092,8 +1077,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public SimpleMapChart(String chartId) {
                 super(chartId);
@@ -1129,8 +1113,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Class constructor.
              *
-             * @param chartId
-             *         The id of the chart.
+             * @param chartId The id of the chart.
              */
             public AdvancedMapChart(String chartId) {
                 super(chartId);
@@ -1139,10 +1122,8 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Gets the value of the chart.
              *
-             * @param valueMap
-             *         Just an empty map. The only reason it exists is to make your life easier.
-             *         You don't have to create a map yourself!
-             *
+             * @param valueMap Just an empty map. The only reason it exists is to make your life easier.
+             *                 You don't have to create a map yourself!
              * @return The value of the chart.
              */
             public abstract HashMap<Country, Integer> getValues(HashMap<Country, Integer> valueMap);
@@ -1464,9 +1445,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Gets a country by it's iso tag.
              *
-             * @param isoTag
-             *         The iso tag of the county.
-             *
+             * @param isoTag The iso tag of the county.
              * @return The country with the given iso tag or <code>null</code> if unknown.
              */
             public static Country byIsoTag(String isoTag) {
@@ -1481,9 +1460,7 @@ public class SpigotPluginHandler implements Listener {
             /**
              * Gets a country by a locale.
              *
-             * @param locale
-             *         The locale.
-             *
+             * @param locale The locale.
              * @return The country from the giben locale or <code>null</code> if unknown country or
              * if the locale does not contain a country.
              */
