@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.scheduler.BukkitRunnable;
 import simple.brainsynder.Core;
 import simple.brainsynder.commands.BaseCommand;
 import simple.brainsynder.files.Language;
@@ -14,6 +15,7 @@ import simple.brainsynder.utils.SpigotPluginHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class CommandSimpleAPI extends BaseCommand {
 
@@ -26,25 +28,31 @@ public class CommandSimpleAPI extends BaseCommand {
         sender.sendMessage("§bSimpleAPI §9>> §7Looking for updates...");
         try {
             List<Boolean> updates = new ArrayList<>();
-            SpigotPluginHandler.updaterMap.forEach((plugin, handle) -> {
-                if (handle.needsUpdate()) {
-                    String downloadURL;
-                    if (handle.getId() != 0) {
-                        downloadURL = "https://spigotmc.org/resources/" + handle.getId() + "/";
-                    } else {
-                        downloadURL = "http://spigotmc.org/members/brainsynder.35575/";
+            CompletableFuture.runAsync(() -> {
+                SpigotPluginHandler.updaterMap.forEach((plugin, handle) -> {
+                    if (handle.needsUpdate()) {
+                        String downloadURL;
+                        if (handle.getId() != 0) {
+                            downloadURL = "https://spigotmc.org/resources/" + handle.getId() + "/";
+                        } else {
+                            downloadURL = "https://spigotmc.org/";
+                        }
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                sender.sendMessage("§bSimpleAPI §9>> §7An update was found for " + handle.getPlugin().getDescription().getName() + "!");
+                                sender.sendMessage("§bSimpleAPI §9>> §7 Current Version: " + plugin.getDescription().getVersion());
+                                sender.sendMessage("§bSimpleAPI §9>> §7 New Version: " + handle.getVersion());
+                                sender.sendMessage("§bSimpleAPI §9>> §7 Download at: " + downloadURL);
+                                updates.add(true);
+                            }
+                        }.runTask(Core.getInstance());
                     }
-                    sender.sendMessage("§bSimpleAPI §9>> §7An update was found for " + handle.getPlugin().getDescription().getName() + "!");
-                    sender.sendMessage("§bSimpleAPI §9>> §7 Current Version: " + plugin.getDescription().getVersion());
-                    sender.sendMessage("§bSimpleAPI §9>> §7 New Version: " + handle.getVersion());
-                    sender.sendMessage("§bSimpleAPI §9>> §7 Download at: " + downloadURL);
-                    updates.add(true);
-                }
+                });
+
+
             });
-            if (updates.isEmpty()) {
-                sender.sendMessage("§bSimpleAPI §9>> §7All plugins using SimpleAPIs' updater are up to date");
-            }
-        }catch (Exception e) {
+        } catch (Exception e) {
             sender.sendMessage("§bSimpleAPI §9>> §7All plugins using SimpleAPIs' updater are up to date");
         }
     }
@@ -58,32 +66,36 @@ public class CommandSimpleAPI extends BaseCommand {
         player.sendMessage("§bSimpleAPI §9>> §7Looking for updates...");
         try {
             List<Boolean> updates = new ArrayList<>();
-            SpigotPluginHandler.updaterMap.forEach((plugin, handle) -> {
-                PluginDescriptionFile pdf = handle.getPlugin().getDescription();
+            SpigotPluginHandler.updaterMap.values().forEach(handler -> {
+                PluginDescriptionFile pdf = handler.getPlugin().getDescription();
                 ITellraw tellraw = Reflection.getTellraw("§9• §b" + pdf.getName() + " >> Hover for more info");
                 tellraw.color(ChatColor.AQUA);
-                if (handle.needsUpdate()) {
-                    tellraw.tooltip(
-                            "§7A new version of §b" + handle.getPlugin().getDescription().getName() + "§7 is Out!",
-                            "§7Version §b" + handle.getVersion() + "§7, current version running is version §b" + handle.getPlugin().getDescription().getVersion(),
-                            "§7Update has §b" + handle.getDownloads() + "§7 download(s)",
-                            "§7It would be wise to check this update out.",
-                            "§7Click this text to go to the spigot page.");
-                    String downloadURL;
-                    if (handle.getId() != 0) {
-                        downloadURL = "https://spigotmc.org/resources/" + handle.getId() + "/";
-                    } else {
-                        downloadURL = "http://spigotmc.org/members/brainsynder.35575/";
-                    }
-                    tellraw.link(downloadURL);
-                    tellraw.send(player);
-                    updates.add(true);
-                }
+                String downloadURL = "http://spigotmc.org//";
+                if (handler.getId() != 0) downloadURL = "https://spigotmc.org/resources/" + handler.getId() + "/";
+                tellraw.link(downloadURL);
+
+                CompletableFuture.runAsync(() -> {
+                    handler.needsUpdate((needsUpdate, version) -> {
+                        tellraw.tooltip(
+                                "§7A new version of §b" + pdf.getName() + "§7 is Out!",
+                                "§7Version §b" + version + "§7, current version running is version §b" + pdf.getVersion(),
+                                "§7Update has §b" + handler.getDownloads() + "§7 download(s)",
+                                "§7It would be wise to check this update out.",
+                                "§7Click this text to go to the spigot page.");
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                updates.add(true);
+                                tellraw.send(player);
+                            }
+                        }.runTask(Core.getInstance());
+                    });
+                });
             });
             if (updates.isEmpty()) {
                 player.sendMessage("§bSimpleAPI §9>> §7All plugins using SimpleAPIs' updater are up to date");
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             player.sendMessage("§bSimpleAPI §9>> §7All plugins using SimpleAPIs' updater are up to date");
         }
     }
