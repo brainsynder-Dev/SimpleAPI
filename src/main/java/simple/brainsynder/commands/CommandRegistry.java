@@ -91,29 +91,20 @@ public class CommandRegistry<P extends Plugin> {
             if (core == null) return false;
             try {
                 if (args.length == 0) {
-                    core.run(sender);
+                    if (core.canExecute(sender)) core.run(sender);
                 } else {
                     String args0 = args[0];
                     SubCommand sub = parse(args0);
                     if (sub == null) {
-                        core.run(sender, args);
+                        if (core.canExecute(sender)) core.run(sender, args);
                         return false;
                     }
-                    sub.run(sender, newArgs(args));
+                    if (sub.canExecute(sender)) sub.run(sender, newArgs(args));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
             return false;
-        }
-
-        private SubCommand findSub (String[] args) {
-            SubCommand sub = null;
-            for (String arg : args) {
-                SubCommand command = parse(arg);
-            }
-
-            return sub;
         }
 
         private SubCommand parse (String name) {

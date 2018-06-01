@@ -9,8 +9,6 @@ import simple.brainsynder.commands.annotations.ICommand;
 import java.util.*;
 
 public class SubCommand {
-    protected boolean overrideTab = false;
-    private List<SubCommand> subCommands = new ArrayList<>();
     private Map<Integer, List<String>> tabCompletion = new HashMap<>();
 
     public void run(CommandSender sender) {
@@ -27,10 +25,15 @@ public class SubCommand {
     }
 
     public void sendUsage(CommandSender sender) {
-        if (!getClass().isAnnotationPresent(ICommand.class)) return;
-        ICommand command = getClass().getAnnotation(ICommand.class);
+        ICommand command = getCommand(getClass());
+        if (command == null) return;
         if (command.usage().isEmpty()) return;
         sender.sendMessage(ChatColor.translateAlternateColorCodes('&', command.usage()));
+    }
+
+    public ICommand getCommand (Class<?> clazz) {
+        if (!clazz.isAnnotationPresent(ICommand.class)) return null;
+        return clazz.getAnnotation(ICommand.class);
     }
 
     public Map<Integer, List<String>> getTabCompletion() {
@@ -40,27 +43,6 @@ public class SubCommand {
     public void tabComplete(List<String> completions, CommandSender sender, String[] args) {
         Validate.notNull(sender, "Sender cannot be null");
         Validate.notNull(args, "Arguments cannot be null");
-        if (!subCommands.isEmpty()) {
-            if (!overrideTab) {
-                if (args.length == 1) {
-                    String toComplete = args[0].toLowerCase(Locale.ENGLISH);
-                    for (SubCommand command : subCommands) {
-                        if (!command.getClass().isAnnotationPresent(ICommand.class)) continue;
-                        ICommand annotation = command.getClass().getAnnotation(ICommand.class);
-                        if (annotation.name().isEmpty()) continue;
-                        if (StringUtil.startsWithIgnoreCase(annotation.name(), toComplete)) {
-                            completions.add(annotation.name());
-                        }
-                        Arrays.asList(annotation.alias()).forEach(name -> {
-                            if (StringUtil.startsWithIgnoreCase(name, toComplete)) {
-                                completions.add(name);
-                            }
-                        });
-                    }
-                }
-            }
-        }
-
         if (!tabCompletion.isEmpty()) {
             int length = args.length;
             if (!tabCompletion.containsKey(length)) return;
@@ -75,19 +57,15 @@ public class SubCommand {
         }
     }
 
+    public boolean canExecute (CommandSender sender) {
+        return true;
+    }
+
     public String messageMaker(String[] args, int start) {
         StringBuilder builder = new StringBuilder();
         for (int i = start; i < args.length; i++) {
             builder.append(args[i]).append(" ");
         }
         return builder.toString().trim();
-    }
-
-    protected void registerSub(SubCommand subCommand) {
-        subCommands.add(subCommand);
-    }
-
-    protected List<SubCommand> getSubCommands() {
-        return subCommands;
     }
 }
