@@ -13,8 +13,6 @@ commands:
     description: Send a title message to player(s).
   simpleapi:
     description: Used to check for updates.
-  particlemaker:
-    description: Send particles to your location.
   compass:
     description: Set the location of the compass needle.
   armorcolor:

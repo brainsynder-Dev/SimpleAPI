@@ -3,6 +3,7 @@ package simple.brainsynder;
 import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import simple.brainsynder.api.ItemMaker;
+import simple.brainsynder.commands.CommandRegistry;
 import simple.brainsynder.commands.list.*;
 import simple.brainsynder.files.Language;
 import simple.brainsynder.listeners.CommandListener;
@@ -30,6 +31,13 @@ public class Core extends JavaPlugin {
             setEnabled(false);
             return;
         }
+
+        try {
+            CommandRegistry registry = new CommandRegistry (this);
+            registry.register(new CommandParticle ());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         instance = this;
         language = new Language(this);
         language.loadDefaults();
@@ -39,7 +47,6 @@ public class Core extends JavaPlugin {
             new CommandAction().registerCommand(this);
             new CommandTab().registerCommand(this);
             new CommandTitle().registerCommand(this);
-            new CommandParticle().registerCommand(this);
             new CommandHistory().registerCommand(this);
             getServer().getPluginManager().registerEvents(new LightDetector(), this);
             getServer().getPluginManager().registerEvents(new TexturefindListener(), this);
