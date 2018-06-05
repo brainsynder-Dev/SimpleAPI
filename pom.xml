@@ -6,7 +6,7 @@
 
     <groupId>simple.brainsynder</groupId>
     <artifactId>SimpleAPI</artifactId>
-    <version>3.8</version>
+    <version>3.8-SNAPSHOT</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

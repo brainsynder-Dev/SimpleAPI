@@ -27,7 +27,7 @@ public class Core extends JavaPlugin {
     public void onEnable() {
         SpigotPluginHandler spigotPluginHandler = new SpigotPluginHandler(this, 24671, SpigotPluginHandler.MetricType.BSTATS);
         SpigotPluginHandler.registerPlugin(spigotPluginHandler);
-        if (!spigotPluginHandler.runTamperCheck("brainsynder", "SimpleAPI", "3.8")) {
+        if (!spigotPluginHandler.runTamperCheck("brainsynder", "SimpleAPI", "3.8-SNAPSHOT")) {
             setEnabled(false);
             return;
         }
