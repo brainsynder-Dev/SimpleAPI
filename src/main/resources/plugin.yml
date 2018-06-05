@@ -1,7 +1,7 @@
 name: SimpleAPI
 main: simple.brainsynder.Core
 authors: ["brainsynder"]
-version: 3.8
+version: 3.8-SNAPSNOT
 loadbefore: [SimplePets, SimpleArmorStandEdit, SimpleMobs, SimpleGadgets-Addon, CSkulls, AntiHackedPotions, SimpleGadgets, SimpleParticles]
 load: STARTUP
 commands:
