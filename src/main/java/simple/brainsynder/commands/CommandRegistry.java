@@ -29,7 +29,7 @@ public class CommandRegistry<P extends Plugin> {
         ICommand annotation = clazz.getAnnotation(ICommand.class);
         if (annotation.name().isEmpty()) throw new Exception(clazz.getSimpleName() + " missing name");
         Command command = new Command0(commandCore, annotation);
-        register(annotation.name(), command);
+        register(plugin.getDescription().getName().toLowerCase(), command);
     }
 
     private class Command0 extends Command {
