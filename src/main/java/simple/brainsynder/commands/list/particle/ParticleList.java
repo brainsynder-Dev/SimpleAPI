@@ -37,7 +37,7 @@ public class ParticleList extends SubCommand {
                     tellraw.then(particle.getName());
                     tellraw.color(ChatColor.GRAY);
                     tellraw.tooltip("§7Click here to auto", "§7insert this into the command");
-                    tellraw.suggest("/particlemaker " + particle.getName() + " 1 0.0,0.0,0.0");
+                    tellraw.suggest("/particlemaker summon " + particle.getName() + " 1 0.0,0.0,0.0");
                 }else {
                     tellraw.then(particle.getName());
                     tellraw.color(ChatColor.RED);

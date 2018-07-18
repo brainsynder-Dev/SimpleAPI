@@ -1,10 +1,12 @@
 name: SimpleAPI
 main: simple.brainsynder.Core
 authors: ["brainsynder"]
-version: 3.8-SNAPSNOT
+version: ${project.version}
 loadbefore: [SimplePets, SimpleArmorStandEdit, SimpleMobs, SimpleGadgets-Addon, CSkulls, AntiHackedPotions, SimpleGadgets, SimpleParticles]
 load: STARTUP
 commands:
+  particlemaker:
+    description: Sends particles to the players location.
   action:
     description: Send a message above the hotbar.
   tab:
