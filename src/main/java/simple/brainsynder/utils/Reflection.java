@@ -11,45 +11,49 @@ package simple.brainsynder.utils;
 
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import simple.brainsynder.nms.*;
-import simple.brainsynder.nms.key.ActionMaker;
-import simple.brainsynder.nms.key.DefaultSignUpdater;
-import simple.brainsynder.nms.key.TellrawMaker;
-import simple.brainsynder.nms.key.TitleMaker;
+import simple.brainsynder.nms.key.*;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class Reflection {
-    private static HashMap<Class<? extends Entity>, Method> handles = new HashMap<> ();
+    private static HashMap<Class<? extends Entity>, Method> handles = new HashMap<>();
 
     public static <T> T invokeNMSStaticMethod(String className, String method, Class<?>[] parameterClasses, Object... params) {
-        return invokeNMSMethod(className, method, null, parameterClasses, (Object[])params);
+        return invokeNMSMethod(className, method, null, parameterClasses, (Object[]) params);
     }
-    
+
     public static <T> T initiateClass(Class<?> clazz) {
         try {
             return (T) clazz.newInstance();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         return null;
     }
-    
+
     public static <T> T initiateClass(Constructor<?> constructor, Object... args) {
         try {
             return (T) constructor.newInstance(args);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         return null;
     }
-    
+
     public static Constructor<?> fillConstructor(Class<?> clazz, Class<?>... values) {
         try {
             return clazz.getDeclaredConstructor(values);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         return null;
     }
 
@@ -60,7 +64,7 @@ public class Reflection {
             Class e = getNmsClass(className);
             Method m = e.getDeclaredMethod(method, parameterClasses);
             m.setAccessible(true);
-            return (T) m.invoke(invoker, (Object[])params);
+            return (T) m.invoke(invoker, (Object[]) params);
         } catch (Exception var7) {
             var7.printStackTrace();
             return null;
@@ -69,7 +73,7 @@ public class Reflection {
 
     public static <T> T invokeNMSMethod(String method, Object invoker, Class<?>[] parameterClasses, Object... params) {
         Validate.isTrue(invoker != null, "Invoker cannot be null");
-        return invokeNMSMethod(invoker.getClass().getSimpleName(), method, invoker, parameterClasses, (Object[])params);
+        return invokeNMSMethod(invoker.getClass().getSimpleName(), method, invoker, parameterClasses, (Object[]) params);
     }
 
     public static <T> T invokeNMSMethod(String method, Object invoker) {
@@ -114,7 +118,7 @@ public class Reflection {
     }
 
     public static <T> T invokeBukkitStaticMethod(String className, String method, Class<?>[] parameterClasses, Object... params) {
-        return invokeBukkitMethod(className, method, null, parameterClasses, (Object[])params);
+        return invokeBukkitMethod(className, method, null, parameterClasses, (Object[]) params);
     }
 
     public static <T> T invokeBukkitMethod(String className, String method, Object invoker, Class<?>[] parameterClasses, Object... params) {
@@ -124,7 +128,7 @@ public class Reflection {
             Class e = getCBCClass(className);
             Method m = e.getDeclaredMethod(method, parameterClasses);
             m.setAccessible(true);
-            return (T) m.invoke(invoker, (Object[])params);
+            return (T) m.invoke(invoker, (Object[]) params);
         } catch (Exception var7) {
             var7.printStackTrace();
             return null;
@@ -132,7 +136,7 @@ public class Reflection {
     }
 
     public static <T> T invokeBukkitMethod(String method, Object invoker, Class<?>[] parameterClasses, Object... params) {
-        return invokeBukkitMethod(invoker.getClass().getName().replace("org.bukkit.craftbukkit." + getVersion() + ".", ""), method, invoker, parameterClasses, (Object[])params);
+        return invokeBukkitMethod(invoker.getClass().getName().replace("org.bukkit.craftbukkit." + getVersion() + ".", ""), method, invoker, parameterClasses, (Object[]) params);
     }
 
     public static <T> T invokeBukkitMethod(String method, Object invoker) {
@@ -222,25 +226,45 @@ public class Reflection {
     private static Constructor<?> iTileSkull = null;
     private static ITabMessage tabMessage = null;
     private static IParticlePacket particlePacket = null;
+    private static IParticleSender particleSender = null;
     private static IUpdateSign iUpdateSign = null;
 
     public static void init() {
-        try {
-            Class<?>[] classes = new Class<?>[]{
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".GlowMaker"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".ActionMessage"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".TitleMessage"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".PathGoal"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".ClearGoal"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".FancyMessage"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".TabMessage"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".HandleAnvilGUI"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".TileSkull"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".ParticlePacket"),
-                    Class.forName("simple.brainsynder.nms." + getVersion() + ".UpdateSign")
-            };
+        glow = null;
+        pathfinderGoal = null;
+        iClearGoals = null;
+        tellraw = null;
+        iAnvil = null;
+        iTileSkull = null;
+        tabMessage = null;
+        particlePacket = null;
 
-            for (Class<?> clazz : classes) {
+        List<Class<?>> classes = new ArrayList<>();
+
+        for (String name : Arrays.asList(
+                "GlowMaker",
+                "ActionMessage",
+                "TitleMessage",
+                "PathGoal",
+                "ClearGoal",
+                "FancyMessage",
+                "TabMessage",
+                "HandleAnvilGUI",
+                "TileSkull",
+                "ParticlePacket",
+                "UpdateSign",
+                "ParticleSender"
+        )) {
+            try {
+                Class<?> clazz = Class.forName("simple.brainsynder.nms." + getVersion() + "." + name);
+                classes.add(clazz);
+            } catch (Exception ignored) {
+            }
+        }
+
+        for (Class<?> clazz : classes) {
+            try {
+
                 if (IGlow.class.isAssignableFrom(clazz)) {
                     glow = (IGlow) clazz.getConstructor().newInstance();
                 }
@@ -259,6 +283,9 @@ public class Reflection {
                 if (TellrawMaker.class.isAssignableFrom(clazz)) {
                     tellraw = clazz.getConstructor(String.class);
                 }
+                if (IParticleSender.class.isAssignableFrom(clazz)) {
+                    particleSender = (IParticleSender) clazz.getConstructor().newInstance();
+                }
                 if (IAnvilGUI.class.isAssignableFrom(clazz)) {
                     iAnvil = clazz.getConstructor(Plugin.class, Player.class, IAnvilClickEvent.class);
                 }
@@ -274,22 +301,19 @@ public class Reflection {
                 if (IUpdateSign.class.isAssignableFrom(clazz)) {
                     iUpdateSign = (IUpdateSign) clazz.getConstructor().newInstance();
                 }
+            } catch (Exception e) {
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Bukkit.getLogger().severe("Could not find nms support for this server version");
-            glow = null;
-            titleMessage = new TitleMaker ();
-            actionMessage = new ActionMaker ();
-            pathfinderGoal = null;
-            iClearGoals = null;
-            tellraw = null;
-            iAnvil = null;
-            iTileSkull = null;
-            tabMessage = null;
-            particlePacket = null;
-            iUpdateSign = new DefaultSignUpdater();
         }
+
+
+        if (titleMessage == null) titleMessage = new TitleMaker();
+        if (actionMessage == null) actionMessage = new ActionMaker();
+        if (particleSender == null) particleSender = new ParticleSender();
+        if (iUpdateSign == null) iUpdateSign = new DefaultSignUpdater();
+    }
+
+    public static IParticleSender getParticleSender() {
+        return particleSender;
     }
 
     public static IUpdateSign getUpdateSign() {
@@ -298,12 +322,12 @@ public class Reflection {
 
     public static ITellraw getTellraw(String s) {
         if (tellraw == null)
-            return new TellrawMaker (s);
+            return new TellrawMaker(s);
         try {
             return (TellrawMaker) tellraw.newInstance(s);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             System.out.println("An error occurred while trying to get the ITellraw instance, sending tellraw command.");
-            return new TellrawMaker (s);
+            return new TellrawMaker(s);
         }
     }
 
@@ -313,7 +337,7 @@ public class Reflection {
         try {
             return (IAnvilGUI) iAnvil.newInstance(plugin, player, event);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            System.out.println ("An error occurred while trying to get the IAnvilGUI instance, returning null.");
+            System.out.println("An error occurred while trying to get the IAnvilGUI instance, returning null.");
             return null;
         }
     }
@@ -324,7 +348,7 @@ public class Reflection {
         try {
             return (ITileEntitySkull) iTileSkull.newInstance(skull);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            System.out.println ("An error occurred while trying to get the ITileSkull instance, returning null.");
+            System.out.println("An error occurred while trying to get the ITileSkull instance, returning null.");
             return null;
         }
     }
@@ -556,5 +580,46 @@ public class Reflection {
             var5.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * Translates the name to a {@link org.bukkit.Material}
+     *
+     * @param name The new/old {@link org.bukkit.Material} name
+     * @return
+     */
+    public static Material findMaterial(String name) {
+        try {
+            return Material.valueOf(name);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            return Material.valueOf("LEGACY_" + name);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            return Material.matchMaterial(name);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            return Material.matchMaterial(name, true);
+        } catch (Exception ignored) {
+        }
+
+        return Material.AIR;
+
+    }
+
+    public static Material fetchMaterial(String... names) {
+        for (String name : names) {
+            try {
+                return Material.valueOf(name);
+            } catch (Exception ignored) {
+            }
+        }
+        return Material.AIR;
     }
 }
