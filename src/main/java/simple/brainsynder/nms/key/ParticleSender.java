@@ -51,6 +51,9 @@ public class ParticleSender implements IParticleSender<Object> {
     @Override
     public Object getPacket(ParticleMaker.Particle type, TriLoc<Float> loc, TriLoc<Float> offset, float speed, int count, Object data) {
         int[] inner = new int[0];
+        float offsetX = offset.getX(),
+                offsetY = offset.getY(),
+                offsetZ = offset.getZ();
 
         if ((type == ParticleMaker.Particle.ITEM_CRACK)
                 || (type == ParticleMaker.Particle.BLOCK_CRACK)
@@ -65,8 +68,14 @@ public class ParticleSender implements IParticleSender<Object> {
                 inner = (int[])data;
             }
         }
-        if (!type.isCompatable()) return null;
+        if (data instanceof DustOptions) {
+            DustOptions dust = (DustOptions) data;
+            offsetX=getColor(dust.getColor().getRed());
+            offsetY=getColor(dust.getColor().getGreen());
+            offsetZ=getColor(dust.getColor().getBlue());
+        }
 
+        if (!type.isCompatable()) return null;
         try {
             Object packet;
             if (newParticlePacketConstructor) {
@@ -77,9 +86,9 @@ public class ParticleSender implements IParticleSender<Object> {
                         (float) loc.getX(),
                         (float) loc.getY(),
                         (float) loc.getZ(),
-                        (float) offset.getX(),
-                        (float) offset.getY(),
-                        (float) offset.getZ(),
+                        (float) offsetX,
+                        (float) offsetY,
+                        (float) offsetZ,
                         (float) speed,
                         count,
                         inner);
@@ -89,9 +98,9 @@ public class ParticleSender implements IParticleSender<Object> {
                         (float) loc.getX(),
                         (float) loc.getY(),
                         (float) loc.getZ(),
-                        (float) offset.getX(),
-                        (float) offset.getY(),
-                        (float) offset.getZ(),
+                        (float) offsetX,
+                        (float) offsetY,
+                        (float) offsetZ,
                         (float) speed,
                         count);
             }
@@ -99,4 +108,13 @@ public class ParticleSender implements IParticleSender<Object> {
         } catch (IllegalAccessException | InstantiationException | InvocationTargetException ignored) {}
         return null;
     }
+
+    private float getColor(double value) {
+        if (value <= 0.0F) {
+            value = -1.0F;
+        }
+
+        return ((float) value) / 255.0F;
+    }
+
 }

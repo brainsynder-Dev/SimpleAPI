@@ -68,6 +68,13 @@ public class ParticleMaker {
         this(type, 0.0D, count, offsetX, offsetY, offsetZ);
     }
 
+    /**
+     * If you are using Redstone Particle then
+     * Please use {@link ParticleMaker#setDustOptions(IParticleSender.DustOptions)}
+     *
+     * @Deprecated
+     */
+    @Deprecated
     public ParticleMaker(Particle type, int count, Color color) {
         this(type, 1.0F, 0, getColor(color.getRed()), getColor(color.getGreen()), getColor(color.getBlue()));
         colored = true;
@@ -75,6 +82,13 @@ public class ParticleMaker {
         this.repeatAmount = count;
     }
 
+    /**
+     * If you are using Redstone Particle then
+     * Please use {@link ParticleMaker#setDustOptions(IParticleSender.DustOptions)}
+     *
+     * @Deprecated
+     */
+    @Deprecated
     public ParticleMaker(Particle type, Color color) {
         this(type, 1, color);
     }
@@ -113,38 +127,45 @@ public class ParticleMaker {
         particleSender = simple.brainsynder.utils.Reflection.getParticleSender();
     }
 
-    public void setSpeed(double speed) {
+    public ParticleMaker setSpeed(double speed) {
         this.speed = speed;
+        return this;
     }
 
-    public void setCount(int count) {
+    public ParticleMaker setCount(int count) {
         this.count = count;
+        return this;
     }
 
-    public void setDustOptions(IParticleSender.DustOptions dustOptions) {
+    public ParticleMaker setDustOptions(IParticleSender.DustOptions dustOptions) {
         this.dustOptions = dustOptions;
+        return this;
     }
 
-    public void setOffset(double offsetX, double offsetY, double offsetZ) {
+    public ParticleMaker setOffset(double offsetX, double offsetY, double offsetZ) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.offsetZ = offsetZ;
+        return this;
     }
 
     public static int getVersion() {
         return version;
     }
 
-    public void setData(Material material, short itemData) {
+    public ParticleMaker setData(Material material, short itemData) {
         data = new ItemStack(material, 1, itemData);
+        return this;
     }
 
-    public void setData(Material material) {
+    public ParticleMaker setData(Material material) {
         setData(material, (short) 0);
+        return this;
     }
 
-    public void setData(ItemStack item) {
+    public ParticleMaker setData(ItemStack item) {
         data = item;
+        return this;
     }
 
     public double getSpeed() {
