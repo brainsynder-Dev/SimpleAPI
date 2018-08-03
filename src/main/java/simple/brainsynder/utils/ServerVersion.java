@@ -18,6 +18,7 @@ public enum ServerVersion {
     }
 
     public int getIntVersion () {
+        if (version.equals("Unknown")) return -1;
         String vString = version.replace("v", "");
         int v = 17;
         if (!vString.isEmpty()) {
