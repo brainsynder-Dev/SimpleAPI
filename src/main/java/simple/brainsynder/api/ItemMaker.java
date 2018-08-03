@@ -9,10 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import simple.brainsynder.nms.IGlow;
 import simple.brainsynder.storage.IStorage;
 import simple.brainsynder.storage.StorageList;
-import simple.brainsynder.utils.AdvMap;
-import simple.brainsynder.utils.Lore;
-import simple.brainsynder.utils.Reflection;
-import simple.brainsynder.utils.Valid;
+import simple.brainsynder.utils.*;
 import simple.brainsynder.wrappers.MaterialWrapper;
 
 import java.util.ArrayList;
@@ -39,7 +36,9 @@ public class ItemMaker implements Cloneable {
     
     public ItemMaker(Material material, byte data) {
         _material = material;
-        _data = data;
+        if (ServerVersion.getVersion() != ServerVersion.v1_13_R1) {
+            _data = data;
+        }
         _amount = 1;
         _name = null;
         enchantmentMap = new AdvMap<>();

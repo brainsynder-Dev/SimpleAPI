@@ -3,7 +3,6 @@ package simple.brainsynder.api;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -17,11 +16,16 @@ import simple.brainsynder.utils.Valid;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * This class is a little messy...
+ * Please use {@link ItemBuilder}
+ */
+@Deprecated
 public class SkullMaker extends ItemMaker{
     private String _owner;
     private String skullOwner = "SimpleAPI";
     public SkullMaker() {
-        super(Material.SKULL_ITEM, (byte)3);
+        super(Reflection.fetchMaterial("SKULL_ITEM", "PLAYER_HEAD"), (byte) 3);
     }
 
     public SkullMaker setOwner(String name) {
