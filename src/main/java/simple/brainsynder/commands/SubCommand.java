@@ -15,6 +15,7 @@ import java.util.*;
 
 public class SubCommand implements CommandExecutor, TabCompleter {
     private Map<Integer, List<String>> tabCompletion = new HashMap<>();
+    private Map<Integer, List<Complete>> tabCompletionArg = new HashMap<>();
 
     public void run(CommandSender sender) {
         run(sender, new String[0]);
@@ -27,6 +28,13 @@ public class SubCommand implements CommandExecutor, TabCompleter {
     protected void registerCompletion(int length, List<String> replacements) {
         Validate.notNull(replacements, "Arguments cannot be null");
         tabCompletion.put(length, replacements);
+    }
+
+    protected void registerCompletion(int length, Complete complete) {
+        Validate.notNull(complete, "Arguments cannot be null");
+        List<Complete> completes = tabCompletionArg.getOrDefault(length, new ArrayList<>());
+        completes.add(complete);
+        tabCompletionArg.put(length, completes);
     }
 
     public void sendUsage(CommandSender sender) {
@@ -55,11 +63,23 @@ public class SubCommand implements CommandExecutor, TabCompleter {
     public void tabComplete(List<String> completions, CommandSender sender, String[] args) {
         Validate.notNull(sender, "Sender cannot be null");
         Validate.notNull(args, "Arguments cannot be null");
-        if (!tabCompletion.isEmpty()) {
+        if ((!tabCompletion.isEmpty()) || (!tabCompletionArg.isEmpty())) {
             int length = args.length;
-            if (!tabCompletion.containsKey(length)) return;
-            List<String> replacements = tabCompletion.getOrDefault(length, new ArrayList<>());
             String toComplete = args[length - 1].toLowerCase(Locale.ENGLISH);
+
+            List<String> replacements = tabCompletion.getOrDefault(length, new ArrayList<>());
+            if ((length - 2) >= 0) {
+                List<Complete> completes = tabCompletionArg.getOrDefault(length, new ArrayList<>());
+                if (!completes.isEmpty()) {
+                    for (Complete complete : completes) {
+                        List<String> replace = new ArrayList<>();
+                        if (complete.handleReplacement(replace, args[length-2].toLowerCase(Locale.ENGLISH))){
+                            replacements = replace;
+                            break;
+                        }
+                    }
+                }
+            }
             for (String command : replacements) {
                 if (command.isEmpty()) continue;
                 if (StringUtil.startsWithIgnoreCase(command, toComplete)) {
@@ -106,5 +126,9 @@ public class SubCommand implements CommandExecutor, TabCompleter {
         Collections.addAll(newArgs, args);
         newArgs.remove(0);
         return newArgs.toArray(new String[newArgs.size()]);
+    }
+
+    protected interface Complete {
+        boolean handleReplacement (List<String> replacements, String name);
     }
 }

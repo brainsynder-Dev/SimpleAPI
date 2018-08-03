@@ -74,7 +74,6 @@ public class ParentCommand extends SubCommand {
             if (args.length == 0) {
                 if (canExecute(sender)) run(sender);
             } else {
-                if (canExecute(sender)) run(sender, args);
                 String args0 = args[0];
                 SubCommand sub = parse(args0);
                 if (sub == null) {

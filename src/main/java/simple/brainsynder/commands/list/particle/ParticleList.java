@@ -37,11 +37,11 @@ public class ParticleList extends SubCommand {
                     tellraw.then(particle.getName());
                     tellraw.color(ChatColor.GRAY);
                     tellraw.tooltip("§7Click here to auto", "§7insert this into the command");
-                    tellraw.suggest("/particlemaker summon " + particle.getName() + " 1 0.0,0.0,0.0");
+                    tellraw.suggest("/particlemaker spawn " + particle.getName() + " 1 0.0");
                 }else {
                     tellraw.then(particle.getName());
                     tellraw.color(ChatColor.RED);
-                    tellraw.tooltip("§cNot supported in your", "§ccurrent server version", "§cUse server version: §7" + particle.getAllowedVersion());
+                    tellraw.tooltip("§cNot supported in your", "§ccurrent server version", "§cUse server version(s): §7" + particle.getAllowedVersion());
                 }
                 if ((ParticleMaker.Particle.values().length ) != i) {
                     tellraw.then(", ");
