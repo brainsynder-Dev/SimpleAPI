@@ -457,6 +457,8 @@ public class ParticleMaker {
             for (Particle particle : values()) {
                 if (particle.getName().equalsIgnoreCase(name))
                     return particle;
+                if (particle.name().equalsIgnoreCase(name))
+                    return particle;
             }
             return UNKNOWN;
         }

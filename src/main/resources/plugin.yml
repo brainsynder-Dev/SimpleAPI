@@ -4,6 +4,7 @@ authors: ["brainsynder"]
 version: ${project.version}
 loadbefore: [SimplePets, SimpleArmorStandEdit, SimpleMobs, SimpleGadgets-Addon, CSkulls, AntiHackedPotions, SimpleGadgets, SimpleParticles]
 load: STARTUP
+api-version: 1.13
 commands:
   particlemaker:
     description: Sends particles to the players location.
@@ -15,13 +16,5 @@ commands:
     description: Send a title message to player(s).
   simpleapi:
     description: Used to check for updates.
-  compass:
-    description: Set the location of the compass needle.
-  armorcolor:
-    description: Give yourself armor with colors from RGB values.
-  firework:
-    description: Launch a random firework in the air.
-  itemrename:
-    description: Rename an item with ease and color codes!
   userhistory:
     description: Get a players past or current name(s).
