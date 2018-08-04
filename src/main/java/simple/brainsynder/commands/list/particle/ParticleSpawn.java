@@ -18,7 +18,7 @@ import java.util.List;
 @ICommand (
         name = "spawn",
         usage = "§8[§7~§8] §e/particlemaker §7spawn §e<particle> §c[data] §c[count] §c[speed] §c[offset]",
-        description = "Spawns the selected particle"
+        description = "Spawns the selected particle (data is not required unless the particle needs it)"
 )
 public class ParticleSpawn extends SubCommand {
     public ParticleSpawn() {
