@@ -8,9 +8,9 @@ import simple.brainsynder.commands.annotations.ICommand;
 
 import java.util.*;
 
-public class ParentCommand extends SubCommand {
+public class ParentCommand<T extends SubCommand> extends SubCommand {
     protected boolean overrideTab = false;
-    private List<SubCommand> subCommands = new ArrayList<>();
+    private List<T> subCommands = new ArrayList<>();
 
     public void sendHelp (CommandSender sender, boolean parent) {
         if (!subCommands.isEmpty())
@@ -26,7 +26,7 @@ public class ParentCommand extends SubCommand {
             if (!overrideTab) {
                 if (args.length == 1) {
                     String toComplete = args[0].toLowerCase(Locale.ENGLISH);
-                    for (SubCommand command : subCommands) {
+                    for (T command : subCommands) {
                         if (!command.getClass().isAnnotationPresent(ICommand.class)) continue;
                         if (!command.canExecute(sender)) continue;
                         ICommand annotation = command.getClass().getAnnotation(ICommand.class);
@@ -46,17 +46,17 @@ public class ParentCommand extends SubCommand {
         super.tabComplete(completions, sender, args);
     }
 
-    protected void registerSub(SubCommand subCommand) {
+    protected void registerSub(T subCommand) {
         subCommands.add(subCommand);
     }
 
-    public List<SubCommand> getSubCommands() {
+    public List<T> getSubCommands() {
         return subCommands;
     }
 
-    private SubCommand parse (String name) {
-        SubCommand sub = null;
-        for (SubCommand command : subCommands) {
+    private T parse (String name) {
+        T sub = null;
+        for (T command : subCommands) {
             if (!command.getClass().isAnnotationPresent(ICommand.class)) continue;
             ICommand annotation = command.getClass().getAnnotation(ICommand.class);
             if (annotation.name().isEmpty()) continue;
@@ -98,8 +98,8 @@ public class ParentCommand extends SubCommand {
 
         if (args.length >= 1) {
             String args0 = args[0];
-            SubCommand sub = null;
-            for (SubCommand command : subCommands) {
+            T sub = null;
+            for (T command : subCommands) {
                 if (!command.getClass().isAnnotationPresent(ICommand.class)) continue;
                 ICommand annotation = command.getClass().getAnnotation(ICommand.class);
                 if (annotation.name().isEmpty()) continue;
