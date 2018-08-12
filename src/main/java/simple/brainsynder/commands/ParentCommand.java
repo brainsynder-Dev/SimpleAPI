@@ -50,7 +50,7 @@ public class ParentCommand extends SubCommand {
         subCommands.add(subCommand);
     }
 
-    protected List<SubCommand> getSubCommands() {
+    public List<SubCommand> getSubCommands() {
         return subCommands;
     }
 
