@@ -24,14 +24,14 @@ public class ParticleSpawn extends SubCommand {
     public ParticleSpawn() {
         registerCompletion(1, fetchList());
         registerCompletion(2, Arrays.asList("c:10"));
-        registerCompletion(2, (replacements, name) -> {
+        registerCompletion(2, (sender, replacements, name) -> {
             if (ParticleMaker.Particle.REDSTONE.fetchName().equalsIgnoreCase(name)) {
                 replacements.addAll(fetchColorList());
                 return true;
             }
             return false;
         });
-        registerCompletion(2, (replacements, name) -> {
+        registerCompletion(2, (sender, replacements, name) -> {
             if (name.toLowerCase().contains("item") || name.toLowerCase().contains("icon") || name.toLowerCase().contains("block")) {
                 replacements.addAll(fetchMaterialList());
                 return true;
@@ -39,7 +39,7 @@ public class ParticleSpawn extends SubCommand {
             return false;
         });
         registerCompletion(3, Arrays.asList("s:0.0"));
-        registerCompletion(3, (replacements, name) -> {
+        registerCompletion(3, (sender, replacements, name) -> {
             if (fetchColorList().contains(name.toUpperCase()) || fetchMaterialList().contains(name.toUpperCase())) {
                 replacements.add("c:10");
                 return true;
@@ -47,14 +47,14 @@ public class ParticleSpawn extends SubCommand {
             return false;
         });
         registerCompletion(4, Arrays.asList("off:0","off:0,0,0"));
-        registerCompletion(4, (replacements, name) -> {
+        registerCompletion(4, (sender, replacements, name) -> {
             if (name.startsWith("c:")) {
                 replacements.add("s:0.0");
                 return true;
             }
             return false;
         });
-        registerCompletion(5, (replacements, name) -> {
+        registerCompletion(5, (sender, replacements, name) -> {
             if (name.startsWith("s:")) {
                 replacements.add("off:0");
                 replacements.add("off:0,0,0");

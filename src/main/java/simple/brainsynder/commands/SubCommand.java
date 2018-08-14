@@ -73,7 +73,7 @@ public class SubCommand implements CommandExecutor, TabCompleter {
                 if (!completes.isEmpty()) {
                     for (Complete complete : completes) {
                         List<String> replace = new ArrayList<>();
-                        if (complete.handleReplacement(replace, args[length-2].toLowerCase(Locale.ENGLISH))){
+                        if (complete.handleReplacement(sender, replace, args[length-2].toLowerCase(Locale.ENGLISH))){
                             replacements = replace;
                             break;
                         }
@@ -129,6 +129,6 @@ public class SubCommand implements CommandExecutor, TabCompleter {
     }
 
     protected interface Complete {
-        boolean handleReplacement (List<String> replacements, String name);
+        boolean handleReplacement (CommandSender sender, List<String> replacements, String name);
     }
 }
