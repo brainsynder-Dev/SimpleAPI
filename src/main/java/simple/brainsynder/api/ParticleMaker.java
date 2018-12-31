@@ -260,7 +260,14 @@ public class ParticleMaker {
             }else data = this.data;
         } else if (type == Particle.REDSTONE) {
             if (dustOptions == null) dustOptions = new IParticleSender.DustOptions(Color.RED, 1);
-            data = dustOptions;
+
+            if ((ServerVersion.getVersion().getIntVersion() >= ServerVersion.v1_13_R1.getIntVersion())) {
+                data = dustOptions;
+            }else{
+                offsetX = getColor(dustOptions.getColor().getRed());
+                offsetY = getColor(dustOptions.getColor().getGreen());
+                offsetZ = getColor(dustOptions.getColor().getBlue());
+            }
         }
 
 

@@ -15,6 +15,9 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.material.MaterialData;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import simple.brainsynder.nbt.StorageTagCompound;
+import simple.brainsynder.nbt.StorageTagList;
+import simple.brainsynder.nbt.StorageTagString;
 import simple.brainsynder.reflection.FieldAccessor;
 import simple.brainsynder.utils.Base64Wrapper;
 import simple.brainsynder.utils.Reflection;
@@ -89,7 +92,7 @@ public class ItemBuilder {
         }
         if (json.containsKey("data")) builder.withData(Integer.parseInt(String.valueOf(json.get("data"))));
 
-        if (json.containsKey("enchants") && (material.name().contains("SKULL"))) {
+        if (json.containsKey("enchants")) {
             JSONArray array = (JSONArray) json.get("enchants");
             for (Object o : array) {
                 try {
@@ -115,6 +118,97 @@ public class ItemBuilder {
 
             if (skull.containsKey("texture")) builder.setTexture(String.valueOf(skull.get("texture")));
             if (skull.containsKey("owner")) builder.setOwner(String.valueOf(skull.get("owner")));
+        }
+
+        return builder;
+    }
+
+    public StorageTagCompound toCompound () {
+        StorageTagCompound compound = new StorageTagCompound ();
+        compound.setString("material", is.getType().name());
+        if (is.getAmount() > 1) compound.setInteger("amount", is.getAmount());
+        if (im.hasDisplayName()) compound.setString("name", im.getDisplayName());
+        if (is.getDurability() > 0) compound.setInteger("data", is.getDurability());
+
+        if (im.hasLore()) {
+            StorageTagList lore = new StorageTagList();
+            im.getLore().forEach(line -> lore.appendTag(new StorageTagString(line)));
+            compound.setTag("lore", lore);
+        }
+
+        if (!is.getEnchantments().isEmpty()) {
+            StorageTagList enchants = new StorageTagList();
+            is.getEnchantments().forEach((enchantment, level) -> enchants.appendTag(new StorageTagString(enchantment.getName()+" ~~ "+level)));
+            compound.setTag("enchants", enchants);
+        }
+
+        if (!im.getItemFlags().isEmpty()) {
+            StorageTagList flags = new StorageTagList();
+            im.getItemFlags().forEach(itemFlag -> flags.appendTag(new StorageTagString(itemFlag.name())));
+            compound.setTag("flags", flags);
+        }
+
+        if (im instanceof SpawnEggMeta) {
+            SpawnEggMeta meta = (SpawnEggMeta) im;
+            compound.setString("entity", meta.getSpawnedType().name());
+        }
+
+        if (im instanceof SkullMeta) {
+            StorageTagCompound skull = new StorageTagCompound();
+            SkullMeta meta = (SkullMeta) im;
+            if (meta.hasOwner()) skull.setString("owner", meta.getOwner());
+
+            String texture = getTexture(getGameProfile(meta));
+            if (!texture.isEmpty()) skull.setString("texture", texture);
+
+            compound.setTag("skullData", skull);
+        }
+        return compound;
+    }
+
+    public static ItemBuilder fromCompound (StorageTagCompound compound) {
+        if (!compound.hasKey("material")) throw new NullPointerException("JSONObject seems to be missing speed material");
+
+        int amount = 1;
+        if (compound.hasKey("amount")) amount = compound.getInteger("amount");
+        Material material = Material.valueOf(compound.getString("material"));
+        ItemBuilder builder = new ItemBuilder(material, amount);
+
+        if (compound.hasKey("name")) builder.withName(compound.getString("name"));
+        if (compound.hasKey("lore")) {
+            List<String> lore = new ArrayList<>();
+            StorageTagList list = (StorageTagList) compound.getTag("lore");
+            for (int i = 0; i < list.tagCount(); i++) lore.add(list.getStringTagAt(i));
+            builder.withLore(lore);
+        }
+        if (compound.hasKey("data")) builder.withData(compound.getInteger("data"));
+
+        if (compound.hasKey("enchants")) {
+            StorageTagList list = (StorageTagList) compound.getTag("enchants");
+            for (int i = 0; i < list.tagCount(); i++) {
+                try {
+                    String[] args = list.getStringTagAt(i).split(" ~~ ");
+                    Enchantment enchant = Enchantment.getByName(args[0]);
+                    int level = Integer.parseInt(args[1]);
+                    builder.withEnchant(enchant, level);
+                }catch (Exception ignored) {}
+            }
+        }
+        if (compound.hasKey("flags")) {
+            StorageTagList list = (StorageTagList) compound.getTag("flags");
+            for (int i = 0; i < list.tagCount(); i++) {
+                ItemFlag flag = ItemFlag.valueOf(list.getStringTagAt(i));
+                builder.withFlag(flag);
+            }
+        }
+        if (compound.hasKey("entity"))
+            builder.withEntity(EntityType.valueOf(compound.getString("entity")));
+
+        if (compound.hasKey("skullData")) {
+            StorageTagCompound skull = compound.getCompoundTag("skullData");
+
+            if (skull.hasKey("texture")) builder.setTexture(skull.getString("texture"));
+            if (skull.hasKey("owner")) builder.setOwner(skull.getString("owner"));
         }
 
         return builder;

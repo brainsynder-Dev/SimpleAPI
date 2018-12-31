@@ -1,8 +1,10 @@
 package simple.brainsynder.commands;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.util.StringUtil;
 import simple.brainsynder.commands.annotations.ICommand;
 
@@ -44,6 +46,11 @@ public class ParentCommand<T extends SubCommand> extends SubCommand {
             }
         }
         super.tabComplete(completions, sender, args);
+    }
+
+    public PluginCommand getBukkitCommand () {
+        ICommand command = getCommand(getClass());
+        return Bukkit.getPluginCommand(command.name());
     }
 
     protected void registerSub(T subCommand) {

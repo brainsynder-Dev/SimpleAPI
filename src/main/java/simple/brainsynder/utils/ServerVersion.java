@@ -37,4 +37,16 @@ public enum ServerVersion {
         }
         return ServerVersion.UNKNOWN;
     }
+
+    public static boolean isEqualNew (ServerVersion version) {
+        return (getVersion().getIntVersion() >= version.getIntVersion());
+    }
+
+    public static boolean isEqual (ServerVersion version) {
+        return (getVersion().getIntVersion() == version.getIntVersion());
+    }
+
+    public static boolean isEqualOld (ServerVersion version) {
+        return (getVersion().getIntVersion() <= version.getIntVersion());
+    }
 }
