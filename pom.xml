@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
     <version>3.8.1-SNAPSHOT</version>
     <modules>
-        <module>MAIN</module>
+        <module>API</module>
         <module>v1_8_R3</module>
         <module>v1_9_R1</module>
         <module>v1_9_R2</module>
@@ -43,7 +43,7 @@
 
     <build>
         <defaultGoal>clean install</defaultGoal>
-        <finalName>${project.parent.artifactId}${module.info}</finalName>
+        <finalName>SimpleAPI${module.info}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
