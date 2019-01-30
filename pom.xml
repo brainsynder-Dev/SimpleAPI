@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>simple.brainsynder</groupId>
-    <artifactId>SimpleAPI</artifactId>
+    <artifactId>SimpleAPI-CORE</artifactId>
     <packaging>pom</packaging>
     <version>3.8.1-SNAPSHOT</version>
     <modules>
@@ -30,10 +30,15 @@
 
     <distributionManagement>
         <repository>
-            <id>central</id>
-            <name>brain-repo-releases</name>
-            <url>http://maven.pluginwiki.us:8081/artifactory/release/</url>
+            <id>cubekrowd-repo</id>
+            <name>cubekrowd-public-releases</name>
+            <url>https://mavenrepo.cubekrowd.net/artifactory/public-release-local/</url>
         </repository>
+        <snapshotRepository>
+            <id>cubekrowd-repo</id>
+            <name>cubekrowd-public-snapshots</name>
+            <url>https://mavenrepo.cubekrowd.net/artifactory/public-snapshot-local/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <build>
