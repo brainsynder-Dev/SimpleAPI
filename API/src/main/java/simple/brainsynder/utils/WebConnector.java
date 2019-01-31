@@ -126,8 +126,4 @@ public class WebConnector {
             return this.value;
         }
     }
-
-    public interface Return<T> {
-        void run(T value);
-    }
 }

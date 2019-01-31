@@ -19,9 +19,7 @@ import simple.brainsynder.nbt.StorageTagList;
 import simple.brainsynder.nbt.StorageTagString;
 import simple.brainsynder.nms.DataConverter;
 import simple.brainsynder.reflection.FieldAccessor;
-import simple.brainsynder.utils.Base64Wrapper;
-import simple.brainsynder.utils.Reflection;
-import simple.brainsynder.utils.Valid;
+import simple.brainsynder.utils.*;
 
 import java.util.*;
 
@@ -41,6 +39,13 @@ public class ItemBuilder {
         if (amount != 1) JSON.put("amount", amount);
         this.is = new ItemStack(material, amount);
         this.im = is.getItemMeta();
+    }
+
+    public static ItemBuilder getSkull (SkullType type) {
+        return getSkull(type, 1);
+    }
+    public static ItemBuilder getSkull (SkullType type, int amount) {
+        return Reflection.getConverter().getSkullMaterial(type).toBuilder(amount);
     }
 
     public static ItemBuilder fromItem (ItemStack stack) {
@@ -434,6 +439,17 @@ public class ItemBuilder {
         }
 
         return main.isSimilar(check);
+    }
+
+    /**
+     * @Deprecated
+     *   This method does not save the data changed for the Meta, It will in the future save it.
+     */
+    @Deprecated
+    public <T extends ItemMeta> ItemBuilder handleMeta (Class<T> clazz, Return<T> meta){
+        if (im != null) return this;
+        if (im.getClass().isAssignableFrom(clazz)) meta.run((T) im);
+        return this;
     }
 
     private String translate(String message) {
