@@ -1,5 +1,5 @@
 name: SimpleAPI
-main: Core
+main: simple.brainsynder.Core
 authors: ["brainsynder"]
 version: ${project.version}
 loadbefore: [SimplePets, SimpleArmorStandEdit, SimpleMobs, SimpleGadgets-Addon, CSkulls, AntiHackedPotions, SimpleGadgets, SimpleParticles]
