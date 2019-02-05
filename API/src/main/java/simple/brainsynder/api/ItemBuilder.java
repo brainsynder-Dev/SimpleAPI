@@ -48,6 +48,16 @@ public class ItemBuilder {
         return Reflection.getConverter().getSkullMaterial(type).toBuilder(amount);
     }
 
+    public static ItemBuilder getColored (MatType type) {
+        return getColored(type, 0);
+    }
+    public static ItemBuilder getColored (MatType type, int data) {
+        return getColored(type, data, 1);
+    }
+    public static ItemBuilder getColored (MatType type, int data, int amount) {
+        return Reflection.getConverter().getColoredMaterial(type, data).toBuilder(amount);
+    }
+
     public static ItemBuilder fromItem (ItemStack stack) {
         ItemBuilder builder = new ItemBuilder(stack.getType(), stack.getAmount());
         if (stack.getData() != null) builder.withData(stack.getData().getData());
