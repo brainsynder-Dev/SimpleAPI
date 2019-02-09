@@ -47,12 +47,20 @@ public class DataConverter {
     }
 
     public static class Data {
-        public Material material;
-        public int data = -1;
+        private Material material;
+        private int data = -1;
 
         public Data(Material material, int data) {
             this.material = material;
             this.data = data;
+        }
+
+        public Material getMaterial() {
+            return material;
+        }
+
+        public int getData() {
+            return data;
         }
 
         public ItemBuilder toBuilder(int amount) {
