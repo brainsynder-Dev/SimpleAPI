@@ -39,7 +39,6 @@ public class WebConnector {
         });
     }
 
-    @Deprecated
     public static void getInputStream (String link, Return<InputStream> streamReturn) {
         CompletableFuture.runAsync(() -> {
             try {
@@ -66,6 +65,7 @@ public class WebConnector {
         });
     }
 
+    @Deprecated
     public static Future<OutputStream> getOutputStream(String link) {
         try {
             System.setProperty("http.agent", "Chrome");
