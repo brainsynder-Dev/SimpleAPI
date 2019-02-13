@@ -23,7 +23,6 @@ public class CommandRegistry<P extends JavaPlugin> {
         PluginCommand command = plugin.getCommand(annotation.name());
         command.setExecutor(commandCore);
         command.setTabCompleter(commandCore);
-        if (!annotation.usage().isEmpty()) command.setUsage(annotation.usage());
         if (!annotation.description().isEmpty()) command.setDescription(annotation.description());
         if (annotation.alias().length != 0) command.setAliases(Arrays.asList(annotation.alias()));
     }
