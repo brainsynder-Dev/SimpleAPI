@@ -1,15 +1,18 @@
 package simple.brainsynder.commands;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.StringUtil;
 import simple.brainsynder.commands.annotations.ICommand;
 import simple.brainsynder.utils.Reflection;
+import simple.brainsynder.utils.Return;
 
 import java.util.*;
 
@@ -130,5 +133,134 @@ public class SubCommand implements CommandExecutor, TabCompleter {
 
     protected interface Complete {
         boolean handleReplacement (CommandSender sender, List<String> replacements, String name);
+    }
+
+    /**
+     * Will target the player/players specified as the argument
+     *
+     * <br>
+     * Allowed Arguments: <Customizable>
+     *
+     * @param argument targeted player(s)
+     * @param value fetched player(s)
+     */
+    public void send(Argument argument, Return<Player> value) {
+        List<String> targets = new ArrayList<>();
+        argument.target(targets);
+        targets.forEach(arg -> send(arg, value));
+    }
+
+    /**
+     * Will target the player/players specified as the argument
+     *
+     * <br>
+     * Allowed Arguments: <Customizable>
+     *
+     * @param argument targeted player(s)
+     * @param value fetched player(s)
+     * @param type return type
+     *             SUCCESS
+     *             NO_PLAYER <If there was no player found>
+     *             NO_TEAM <If the team selected was not found>
+     */
+    public void send(Argument argument, Return<Player> value, Return<ReturnType> type) {
+        List<String> targets = new ArrayList<>();
+        argument.target(targets);
+        targets.forEach(arg -> send(arg, value, type));
+    }
+
+    /**
+     * Will target the player/players specified as the argument
+     *
+     * <br>
+     * Allowed Arguments:
+     * - @a (all players)
+     * - team=<scoreboard team> (Will target a certain team and all of its members)
+     * - <name> (Will target the selected player)
+     * - <uuid> (Will target the selected player)
+     *
+     * @param argument targeted player(s)
+     * @param value fetched player(s)
+     */
+    public void send(String argument, Return<Player> value){
+        send(argument, value, value1 -> {});
+    }
+
+    /**
+     * Will target the player/players specified as the argument
+     *
+     * <br>
+     * Allowed Arguments:
+     * - @a (all players)
+     * - team=<scoreboard team> (Will target a certain team and all of its members)
+     * - <name> (Will target the selected player)
+     * - <uuid> (Will target the selected player)
+     *
+     * @param argument targeted player(s)
+     * @param value fetched player(s)
+     * @param type return type
+     *             SUCCESS
+     *             NO_PLAYER <If there was no player found>
+     *             NO_TEAM <If the team selected was not found>
+     */
+    public void send(String argument, Return<Player> value, Return<ReturnType> type) {
+        if (argument.equals("@a")) {
+            type.run(ReturnType.SUCCESS);
+            Bukkit.getOnlinePlayers().forEach(value::run);
+            return;
+        }
+
+        // Checks if the argument is a team selector
+        if (argument.startsWith("team=")) {
+            Team team = Bukkit.getScoreboardManager().getMainScoreboard().getTeam(argument.replaceFirst("team=", ""));
+            if (team == null) {
+                type.run(ReturnType.NO_TEAM);
+                return;
+            }
+            type.run(ReturnType.SUCCESS);
+            for (String name : team.getEntries()) {
+                Player target = Bukkit.getPlayer(name);
+                if (target != null) value.run(target);
+            }
+            return;
+        }
+
+        // Checks if the argument is a UUID
+        try {
+            UUID uuid = UUID.fromString(argument);
+            Player target = Bukkit.getPlayer(uuid);
+            if (target == null) {
+                type.run(ReturnType.NO_PLAYER);
+                return;
+            }
+            type.run(ReturnType.SUCCESS);
+            value.run(target);
+            return;
+        }catch (Exception ignored) {}
+
+        // Checks if the argument is a player name
+        Player target = Bukkit.getPlayer(argument);
+        if (target == null) {
+            type.run(ReturnType.NO_PLAYER);
+            return;
+        }
+        type.run(ReturnType.SUCCESS);
+        value.run(target);
+    }
+
+    public enum ReturnType {
+        SUCCESS,
+        NO_TEAM,
+        NO_PLAYER
+    }
+
+    public interface Argument {
+        void target (List<String> targets);
+    }
+
+    public List<String> getOnlinePlayers () {
+        List<String> list = new ArrayList<>();
+        Bukkit.getOnlinePlayers().forEach(player -> list.add(player.getName()));
+        return list;
     }
 }
