@@ -45,6 +45,7 @@ public class Core extends JavaPlugin {
             CommandRegistry<Core> registry = new CommandRegistry (this);
             registry.register(new CommandHistory());
             registry.register(new CommandParticle());
+            registry.register(new CommandAction());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -53,7 +54,6 @@ public class Core extends JavaPlugin {
         Reflection.init();
         new CommandSimpleAPI().registerCommand(this);
         if (!language.getBoolean(Language.API)) {
-            new CommandAction().registerCommand(this);
             new CommandTab().registerCommand(this);
             new CommandTitle().registerCommand(this);
             getServer().getPluginManager().registerEvents(new LightDetector(), this);
