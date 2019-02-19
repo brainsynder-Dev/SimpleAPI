@@ -1,67 +1,85 @@
 package simple.brainsynder.commands.list;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import simple.brainsynder.Core;
 import simple.brainsynder.api.WebAPI;
-import simple.brainsynder.commands.BaseCommand;
-import simple.brainsynder.files.Language;
+import simple.brainsynder.commands.ParentCommand;
+import simple.brainsynder.commands.annotations.ICommand;
 import simple.brainsynder.nms.ITellraw;
-import simple.brainsynder.utils.Perms;
 import simple.brainsynder.utils.Reflection;
 
-public class CommandHistory extends BaseCommand {
+@ICommand (
+        name = "userhistory",
+        description = "Collects the users name history"
+)
+public class CommandHistory extends ParentCommand {
     public CommandHistory() {
-        super("userhistory");
+        registerCompletion(1, getOnlinePlayers());
     }
 
     @Override
-    public void playerSendCommandEvent(Player player, String[] args) {
-        if (!Perms.HISTORY.has(player)) {
-            player.sendMessage(Core.getLanguage().getString(Language.NOPERMISSION, true));
+    public boolean canExecute(CommandSender sender) {
+        return sender.hasPermission("SimpleAPI.command.history");
+    }
+
+    @Override
+    public void run(CommandSender sender, String[] args) {
+        if (args.length == 0) {
+            sendUsage(sender);
             return;
         }
-        if (args.length == 0) {
-            ITellraw message = Reflection.getTellraw("Usage: /userhistory ");
-            message.color(ChatColor.RED);
-            message.then("<username>");
-            message.color(ChatColor.RED);
-            message.tooltip("§7This argument can be a", "§7Players past name or their current name", "§cNote: §7Username must be valid");
-            message.send(player);
-        } else {
-            String username = ChatColor.stripColor(args[0]);
-            player.sendMessage("§3Loading name history for: " + username);
-            WebAPI.findHistory(username, names -> {
-                if (names.isEmpty()) {
-                    player.sendMessage("§cError: §7An error occurred when connecting to minecraftchar.us, Is the username correct?");
-                    return;
-                }
-                player.sendMessage(ChatColor.DARK_AQUA+username + "'s NameHistory ----");
-                int num = 0;
-                int size = names.size();
-                for (String S : names) {
-                    if (num == 0 && (((size - 1) != num))) {
-                        player.sendMessage("§9- §7" + S.replace("(First Username)", "§b(First Name)"));
-                    } else if (num == (size - 1)) {
-                        player.sendMessage("§9- §7" + S.replace("(First Username)", "") + " §b(Current Name)");
-                    } else {
-                        player.sendMessage("§9- §7" + S.replace("(First Username)", ""));
-                    }
-                    num++;
-                }
-                StringBuilder line2 = new StringBuilder();
-                for (int i = 0; i < (size - 3); i++)
-                    line2.append('-');
-                player.sendMessage(ChatColor.DARK_AQUA + line2.toString());
 
+
+        String username = ChatColor.stripColor(args[0]);
+        sender.sendMessage("§3Loading name history for: " + username);
+        WebAPI.findHistory(username, names -> {
+            if (names.isEmpty()) {
+                sender.sendMessage("§cError: §7An error occurred when connecting to minecraftchar.us, Is the username correct?");
+                return;
+            }
+            sender.sendMessage(ChatColor.DARK_AQUA+username + "'s NameHistory ----");
+            int num = 0;
+            int size = names.size();
+            for (String S : names) {
+                if (num == 0 && (((size - 1) != num))) {
+                    sender.sendMessage("§9- §7" + S.replace("(First Username)", "§b(First Name)"));
+                } else if (num == (size - 1)) {
+                    sender.sendMessage("§9- §7" + S.replace("(First Username)", "") + " §b(Current Name)");
+                } else {
+                    sender.sendMessage("§9- §7" + S.replace("(First Username)", ""));
+                }
+                num++;
+            }
+            StringBuilder line2 = new StringBuilder();
+            for (int i = 0; i < (size - 3); i++)
+                line2.append('-');
+            sender.sendMessage(ChatColor.DARK_AQUA + line2.toString());
+
+            if (sender instanceof Player) {
                 ITellraw message = Reflection.getTellraw("Name history received at: ");
                 message.color(ChatColor.DARK_AQUA);
                 message.then("v2.minecraftchar.us/history/?user=" + username);
                 message.color(ChatColor.GRAY);
                 message.tooltip("§7Click here to go to the page");
                 message.link("https://v2.minecraftchar.us/history/?user=" + username);
-                message.send(player);
-            });
+                message.send((Player) sender);
+            }else{
+                sender.sendMessage("§3Name history received at: §7http://v2.minecraftchar.us/history/?user=" + username);
+            }
+        });
+    }
+
+    @Override
+    public void sendUsage(CommandSender sender) {
+        if (sender instanceof Player) {
+            ITellraw message = Reflection.getTellraw("Usage: /userhistory ");
+            message.color(ChatColor.GRAY);
+            message.then("§4<§cusername§4>");
+            message.tooltip("§7This argument can be a", "§7Players past name or their current name", "§cNote: §7Username must be valid");
+            message.send((Player) sender);
+            return;
         }
+        super.sendUsage(sender);
     }
 }

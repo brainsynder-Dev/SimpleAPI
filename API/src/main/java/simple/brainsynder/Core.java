@@ -43,6 +43,7 @@ public class Core extends JavaPlugin {
         }
         try {
             CommandRegistry<Core> registry = new CommandRegistry (this);
+            registry.register(new CommandHistory());
             registry.register(new CommandParticle());
         } catch (Exception e) {
             e.printStackTrace();
@@ -55,7 +56,6 @@ public class Core extends JavaPlugin {
             new CommandAction().registerCommand(this);
             new CommandTab().registerCommand(this);
             new CommandTitle().registerCommand(this);
-            new CommandHistory().registerCommand(this);
             getServer().getPluginManager().registerEvents(new LightDetector(), this);
             getServer().getPluginManager().registerEvents(new TexturefindListener(), this);
             getServer().getPluginManager().registerEvents(new CommandListener(), this);
