@@ -46,13 +46,13 @@ public class Core extends JavaPlugin {
             registry.register(new CommandHistory());
             registry.register(new CommandParticle());
             registry.register(new CommandAction());
+            registry.register(new CommandSimpleAPI());
         } catch (Exception e) {
             e.printStackTrace();
         }
         language = new Language(this);
         language.loadDefaults();
         Reflection.init();
-        new CommandSimpleAPI().registerCommand(this);
         if (!language.getBoolean(Language.API)) {
             new CommandTab().registerCommand(this);
             new CommandTitle().registerCommand(this);
