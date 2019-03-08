@@ -6,6 +6,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import simple.brainsynder.nms.DataConverter;
+import simple.brainsynder.nms.materials.*;
+import simple.brainsynder.nms.materials.types.*;
 import simple.brainsynder.utils.MatType;
 import simple.brainsynder.utils.SkullType;
 import simple.brainsynder.wrappers.DyeColorWrapper;
@@ -115,5 +117,97 @@ public class DataConverterHandler extends DataConverter {
         }
 
         return super.findMaterial(name);
+    }
+
+    @Override
+    public Data getWoodMaterial(WoodSelector selector, WoodType type) {
+        String name = type.name();
+        if (selector == WoodSelector.DOUBLE_SLAB) {
+            name = name+"_SLAB";
+        }else{
+            name = name+"_"+selector.name();
+        }
+        return new Data(findMaterial(name), -1);
+    }
+
+    @Override
+    public Data getFishMaterial(FishType type, boolean cooked) {
+        String prefix = ((cooked) ? "COOKED_" : "");
+        Material material = Material.COD;
+        if (type == FishType.SALMON) material = Material.SALMON;
+        if ((type == FishType.PUFFERFISH) && (!cooked)) material = Material.PUFFERFISH;
+        if ((type == FishType.CLOWNFISH) && (!cooked)) material = Material.TROPICAL_FISH;
+        return new Data(findMaterial(prefix+material.name()), -1);
+    }
+
+    @Override
+    public Data getSlabMaterial(StoneSlabType type, boolean single) {
+        String name = type.getName();
+        if (type == StoneSlabType.WOODEN) name = "PETRIFIED_OAK";
+        return new Data(findMaterial(name+"_SLAB"), -1);
+    }
+
+    @Override
+    public Data getMaterial(WrappedType type) {
+        Material material = Material.AIR;
+        if (type instanceof GrassType) {
+            GrassType value = (GrassType) type;
+            switch (value) {
+                case DEAD:
+                    material = Material.DEAD_BUSH;
+                    break;
+                case NORMAL:
+                    material = Material.GRASS;
+                    break;
+                case FERN_LIKE:
+                    material = Material.FERN;
+                    break;
+            }
+        }else if (type instanceof PrismarineType) {
+            PrismarineType value = (PrismarineType) type;
+            switch (value) {
+                case REGULAR:
+                    material = Material.PRISMARINE;
+                    break;
+                case BRICKS:
+                    material = Material.PRISMARINE_BRICKS;
+                    break;
+                case DARK:
+                    material = Material.DARK_PRISMARINE;
+                    break;
+            }
+        }else if (type instanceof QuartzType) {
+            QuartzType value = (QuartzType) type;
+            switch (value) {
+                case REGULAR:
+                    material = Material.QUARTZ_BLOCK;
+                    break;
+                case CHISELED:
+                    material = Material.CHISELED_QUARTZ_BLOCK;
+                    break;
+                case PILLAR:
+                    material = Material.QUARTZ_PILLAR;
+                    break;
+            }
+        }else if (type instanceof MonsterEggType) {
+            MonsterEggType value = (MonsterEggType) type;
+            material = findMaterial("INFESTED_"+value.name());
+        }else if (type instanceof GoldAppleType) {
+            GoldAppleType value = (GoldAppleType) type;
+            material = ((value == GoldAppleType.REGULAR) ? Material.GOLDEN_APPLE : Material.ENCHANTED_GOLDEN_APPLE);
+        }else if (type instanceof CobbleWallType) {
+            CobbleWallType value = (CobbleWallType) type;
+            material = ((value == CobbleWallType.COBBLE) ? Material.COBBLESTONE_WALL : Material.MOSSY_COBBLESTONE_WALL);
+        }else{
+            material = findMaterial(type.getName());
+        }
+        return new Data(material, -1);
+    }
+
+    @Override
+    public Data getSandStone(SandType sandType, SandStoneType stoneType) {
+        String name = sandType.name()+"STONE";
+        if (stoneType != SandStoneType.REGULAR) name = stoneType.name()+"_"+name;
+        return new Data(findMaterial(name), -1);
     }
 }
