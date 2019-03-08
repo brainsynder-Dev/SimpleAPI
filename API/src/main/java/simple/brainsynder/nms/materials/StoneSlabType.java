@@ -1,6 +1,6 @@
 package simple.brainsynder.nms.materials;
 
-public enum StoneSlabType implements WrappedType {
+public enum StoneSlabType {
     STONE,
     SANDSTONE,
     WOODEN,
@@ -10,12 +10,10 @@ public enum StoneSlabType implements WrappedType {
     NETHER_BRICK,
     QUARTZ;
 
-    @Override
     public String getName() {
         return name();
     }
 
-    @Override
     public int getData() {
         return ordinal();
     }
