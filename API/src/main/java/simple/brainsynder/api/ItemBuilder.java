@@ -237,8 +237,10 @@ public class ItemBuilder {
 
     public ItemBuilder withEntity(EntityType type) {
         JSON.put("entity", type.name());
-        ItemStack stack = Reflection.getConverter().getSpawnEgg(type, is);
-        if (is.getType() == stack.getType()) is = stack;
+        is.setItemMeta(im);
+
+        is = Reflection.getConverter().getSpawnEgg(type, is);
+        im = is.getItemMeta();
         return this;
     }
 
