@@ -19,6 +19,8 @@ import simple.brainsynder.nbt.StorageTagCompound;
 import simple.brainsynder.nbt.StorageTagList;
 import simple.brainsynder.nbt.StorageTagString;
 import simple.brainsynder.nms.DataConverter;
+import simple.brainsynder.nms.materials.*;
+import simple.brainsynder.nms.materials.types.SandType;
 import simple.brainsynder.reflection.FieldAccessor;
 import simple.brainsynder.utils.*;
 
@@ -26,9 +28,15 @@ import java.util.*;
 
 @SuppressWarnings("ALL")
 public class ItemBuilder {
+    private static DataConverter converter = null;
     private JSONObject JSON;
     private ItemStack is;
     private ItemMeta im;
+
+    public static DataConverter getConverter() {
+        if (converter == null) converter = Reflection.getConverter();
+        return converter;
+    }
 
     public ItemBuilder(Material material) {
         this (material, 1);
@@ -46,7 +54,7 @@ public class ItemBuilder {
         return getSkull(type, 1);
     }
     public static ItemBuilder getSkull (SkullType type, int amount) {
-        return Reflection.getConverter().getSkullMaterial(type).toBuilder(amount);
+        return getConverter().getSkullMaterial(type).toBuilder(amount);
     }
 
     public static ItemBuilder getColored (MatType type) {
@@ -56,7 +64,23 @@ public class ItemBuilder {
         return getColored(type, data, 1);
     }
     public static ItemBuilder getColored (MatType type, int data, int amount) {
-        return Reflection.getConverter().getColoredMaterial(type, data).toBuilder(amount);
+        return getConverter().getColoredMaterial(type, data).toBuilder(amount);
+    }
+
+    public static ItemBuilder getMaterial (WrappedType type) {
+        return getConverter().getMaterial(type).toBuilder(1);
+    }
+    public static ItemBuilder getSandStone (SandType sandType, SandStoneType stoneType) {
+        return getConverter().getSandStone(sandType, stoneType).toBuilder(1);
+    }
+    public static ItemBuilder getSlabMaterial (StoneSlabType type, boolean single) {
+        return getConverter().getSlabMaterial(type, single).toBuilder(1);
+    }
+    public static ItemBuilder getFishMaterial (FishType type, boolean cooked) {
+        return getConverter().getFishMaterial(type, cooked).toBuilder(1);
+    }
+    public static ItemBuilder getWoodMaterial(WoodSelector selector, WoodType type) {
+        return getConverter().getWoodMaterial(selector, type).toBuilder(1);
     }
 
     public static ItemBuilder fromItem (ItemStack stack) {
