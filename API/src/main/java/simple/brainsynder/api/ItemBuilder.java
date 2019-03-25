@@ -3,6 +3,7 @@ package simple.brainsynder.api;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import org.apache.commons.lang.WordUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -233,6 +234,11 @@ public class ItemBuilder {
         JSON.put("name", name);
         im.setDisplayName(translate(name));
         return this;
+    }
+
+    public String getName () {
+        if (im.hasDisplayName()) return im.getDisplayName();
+        return WordUtils.capitalizeFully(is.getType().name().toLowerCase().replace("_", " "));
     }
 
     public ItemBuilder withEntity(EntityType type) {
