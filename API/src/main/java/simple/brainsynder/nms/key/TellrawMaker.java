@@ -3,6 +3,7 @@ package simple.brainsynder.nms.key;
 import com.google.gson.stream.JsonWriter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import simple.brainsynder.nms.ITellraw;
 import simple.brainsynder.utils.MessagePart;
@@ -133,6 +134,24 @@ public class TellrawMaker implements ITellraw {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public void send(CommandSender sender) {
+        if (sender instanceof Player) {
+            send((Player)sender);
+            return;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        messageParts.forEach(part -> {
+            if (part.color != null) builder.append(part.color);
+            if (part.styles != null) {
+                for (ChatColor style : part.styles) builder.append(style);
+            }
+            builder.append(part.text);
+        });
+        sender.sendMessage(builder.toString());
     }
 
     public void send(Iterable<Player> players) {

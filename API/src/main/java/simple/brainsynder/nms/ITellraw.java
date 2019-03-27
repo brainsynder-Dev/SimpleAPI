@@ -1,6 +1,7 @@
 package simple.brainsynder.nms;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collection;
@@ -26,6 +27,8 @@ public interface ITellraw {
     ITellraw then(Object obj);
 
     String toJSONString();
+
+    void send(CommandSender sender);
 
     void send(Player player);
 
