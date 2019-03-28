@@ -292,32 +292,23 @@ public class SpigotPluginHandler implements Listener {
     }
 
     private void runUpdateCheck() {
+        PluginDescriptionFile pdf = plugin.getDescription();
         new BukkitRunnable() {
             @Override
             public void run() {
-                PluginUpdater updater = new PluginUpdater(plugin, id, false);
-                PluginUpdater.UpdateResult result = updater.getResult();
                 String downloadURL = "https://www.spigotmc.org/resources/" + id + '/';
                 runUpdateCheck();
-                switch (result) {
-                    case UPDATE_AVAILABLE: {
-                        if (!needsUpdate) {
-                            version = updater.getVersion();
-                            System.out.println('[' + plugin.getDescription().getName() + "] An update was found!");
-                            System.out.println('[' + plugin.getDescription().getName() + "] Current Version: " + plugin.getDescription().getVersion());
-                            System.out.println('[' + plugin.getDescription().getName() + "] New Version: " + updater.getVersion());
-                            System.out.println('[' + plugin.getDescription().getName() + "] Download at: " + downloadURL);
-                            needsUpdate = true;
-                        }
-                        break;
-                    }
-                }
-
+                needsUpdate((needsUpdate, version) -> {
+                    System.out.println("SimpleAPI >> An update was found for " + pdf.getName() + "!");
+                    System.out.println("SimpleAPI >>  Current Version: " + pdf.getVersion());
+                    System.out.println("SimpleAPI >>  New Version: " + version);
+                    System.out.println("SimpleAPI >>  Download at: " + downloadURL);
+                });
             }
-        }.runTaskLaterAsynchronously(plugin, 20 * 60 * 10);
+        }.runTaskLater(plugin, 20 * 60 * 10);
     }
 
-    public void needsUpdate (UpdateValue value) {
+    public void needsUpdate(UpdateValue value) {
         CompletableFuture.runAsync(() -> {
             boolean update = false;
             String version = "";
@@ -331,6 +322,7 @@ public class SpigotPluginHandler implements Listener {
                     }
                 }
             }
+            if (!update) return;
 
             String finalVersion = version;
             boolean finalUpdate = update;
@@ -344,7 +336,7 @@ public class SpigotPluginHandler implements Listener {
     }
 
     public interface UpdateValue {
-        void run (boolean needsUpdate, String version);
+        void run(boolean needsUpdate, String version);
     }
 
     public boolean needsUpdate() {
@@ -451,14 +443,14 @@ public class SpigotPluginHandler implements Listener {
                 JSONArray versionsArray = (JSONArray) JSONValue.parseWithException(IOUtils.toString(inputStream));
                 String lastVersion = ((JSONObject) versionsArray.get(0)).get("name").toString();
                 DOWNLOADS = ((JSONObject) versionsArray.get(0)).get("downloads").toString();
-                if (shouldUpdate(PluginUpdater.this.oldVersion, lastVersion)) {
-                    PluginUpdater.this.version = lastVersion;
-                    PluginUpdater.this.result = UpdateResult.UPDATE_AVAILABLE;
+                if (shouldUpdate(oldVersion, lastVersion)) {
+                    version = lastVersion;
+                    result = UpdateResult.UPDATE_AVAILABLE;
                 } else {
-                    PluginUpdater.this.result = UpdateResult.NO_UPDATE;
+                    result = UpdateResult.NO_UPDATE;
                 }
             } catch (Exception e) {
-                PluginUpdater.this.result = UpdateResult.FAIL_SPIGOT;
+                result = UpdateResult.FAIL_SPIGOT;
             }
         }
 
@@ -470,8 +462,28 @@ public class SpigotPluginHandler implements Listener {
             }
         }
 
+        private int[] format(String version) {
+            int[] target = new int[3];
+            String prep = version.toLowerCase()
+                    .replace("-snapshot", "").replace("-release", "");
+            String[] found = prep.replace(".", "-").split("-");
+            target[0] = Integer.parseInt(found[0]);
+            target[1] = Integer.parseInt(found[1]);
+            target[2] = ((found.length == 3) ? Integer.parseInt(found[2]) : 0);
+            return target;
+        }
+
         public boolean shouldUpdate(String localVersion, String remoteVersion) {
-            return !localVersion.equalsIgnoreCase(remoteVersion);
+            try {
+                int[] remote = format(remoteVersion);
+                int[] local = format(localVersion);
+                if ((remote[0] >= local[0])
+                        && (remote[1] > local[1])
+                        || (remote[2] > local[2])) return true;
+            }catch (Exception e) {
+                return !localVersion.equalsIgnoreCase(remoteVersion);
+            }
+            return false;
         }
 
         public String getDownloads() {

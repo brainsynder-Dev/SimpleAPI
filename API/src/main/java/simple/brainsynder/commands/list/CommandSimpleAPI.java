@@ -4,8 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
-import org.bukkit.scheduler.BukkitRunnable;
-import simple.brainsynder.Core;
 import simple.brainsynder.commands.ParentCommand;
 import simple.brainsynder.commands.annotations.ICommand;
 import simple.brainsynder.nms.ITellraw;
@@ -14,9 +12,8 @@ import simple.brainsynder.utils.SpigotPluginHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-@ICommand (
+@ICommand(
         name = "simpleapi",
         description = "Checks if any of the plugins that use SimpleAPI need updating"
 )
@@ -36,35 +33,25 @@ public class CommandSimpleAPI extends ParentCommand {
                 tellraw.link(downloadURL);
 
                 String finalDownloadURL = downloadURL;
-                CompletableFuture.runAsync(() -> {
-                    handler.needsUpdate((needsUpdate, version) -> {
-                        tellraw.tooltip(
-                                "§7A new version of §b" + pdf.getName() + "§7 is Out!",
-                                "§7Version §b" + version + "§7, current version running is version §b" + pdf.getVersion(),
-                                "§7Update has §b" + handler.getDownloads() + "§7 download(s)",
-                                "§7It would be wise to check this update out.",
-                                "§7Click this text to go to the spigot page.");
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                updates.add(true);
-                                if (sender instanceof Player) {
-                                    tellraw.send((Player) sender);
-                                } else {
-                                    sender.sendMessage("§bSimpleAPI §9>> §7An update was found for " + pdf.getName() + "!");
-                                    sender.sendMessage("§bSimpleAPI §9>> §7 Current Version: " + pdf.getVersion());
-                                    sender.sendMessage("§bSimpleAPI §9>> §7 New Version: " + version);
-                                    sender.sendMessage("§bSimpleAPI §9>> §7 Download at: " + finalDownloadURL);
+                handler.needsUpdate((needsUpdate, version) -> {
+                    tellraw.tooltip(
+                            "§7A new version of §b" + pdf.getName() + "§7 is Out!",
+                            "§7Version §b" + version + "§7, current version running is version §b" + pdf.getVersion(),
+                            "§7Update has §b" + handler.getDownloads() + "§7 download(s)",
+                            "§7It would be wise to check this update out.",
+                            "§7Click this text to go to the spigot page.");
+                    updates.add(true);
+                    if (sender instanceof Player) {
+                        tellraw.send((Player) sender);
+                    } else {
+                        sender.sendMessage("§bSimpleAPI §9>> §7An update was found for " + pdf.getName() + "!");
+                        sender.sendMessage("§bSimpleAPI §9>> §7 Current Version: " + pdf.getVersion());
+                        sender.sendMessage("§bSimpleAPI §9>> §7 New Version: " + version);
+                        sender.sendMessage("§bSimpleAPI §9>> §7 Download at: " + finalDownloadURL);
 
-                                }
-                            }
-                        }.runTask(Core.getInstance());
-                    });
+                    }
                 });
             });
-            if (updates.isEmpty()) {
-                sender.sendMessage("§bSimpleAPI §9>> §7All plugins using SimpleAPIs' updater are up to date");
-            }
         } catch (Exception e) {
             sender.sendMessage("§bSimpleAPI §9>> §7All plugins using SimpleAPIs' updater are up to date");
         }
