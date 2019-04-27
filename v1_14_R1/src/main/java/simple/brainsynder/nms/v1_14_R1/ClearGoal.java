@@ -13,10 +13,8 @@ public class ClearGoal implements IClearGoals {
     @Override
     public void clearGoals(org.bukkit.entity.Entity e) {
         EntityInsentient creature = (EntityInsentient) ((CraftEntity) e).getHandle();
-        ((Set) Reflection.getPrivateField("b", PathfinderGoalSelector.class, creature.goalSelector)).clear();
-        ((Set)Reflection.getPrivateField("c", PathfinderGoalSelector.class, creature.goalSelector)).clear();
-        ((Set)Reflection.getPrivateField("b", PathfinderGoalSelector.class, creature.targetSelector)).clear();
-        ((Set)Reflection.getPrivateField("c", PathfinderGoalSelector.class, creature.targetSelector)).clear();
+        ((Set) Reflection.getPrivateField("d", PathfinderGoalSelector.class, creature.goalSelector)).clear();
+        ((Set)Reflection.getPrivateField("d", PathfinderGoalSelector.class, creature.targetSelector)).clear();
         creature.goalSelector.a(0, new PathfinderGoalFloat(creature));
     }
 }
