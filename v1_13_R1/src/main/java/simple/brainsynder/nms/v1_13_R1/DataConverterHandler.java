@@ -23,7 +23,7 @@ public class DataConverterHandler extends DataConverter {
 
 
         Material material;
-        if (type == MatType.INK_SACK) {
+        if ((type == MatType.INK_SACK) || (type == MatType.DYE)) {
             if (dye == DyeColorWrapper.WHITE) {
                 material = Material.BONE_MEAL;
             } else if (dye == DyeColorWrapper.YELLOW) {

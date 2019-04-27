@@ -5,6 +5,7 @@ public enum MatType {
     WOOL,
     STAINED_CLAY("TERRACOTTA"),
     INK_SACK,
+    DYE,
     CONCRETE,
     CONCRETE_POWDER;
     private String name;

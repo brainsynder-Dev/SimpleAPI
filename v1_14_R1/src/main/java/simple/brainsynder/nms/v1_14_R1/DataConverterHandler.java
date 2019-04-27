@@ -1,4 +1,4 @@
-package simple.brainsynder.nms.v1_13_R2;
+package simple.brainsynder.nms.v1_14_R1;
 
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -23,19 +23,19 @@ public class DataConverterHandler extends DataConverter {
 
 
         Material material;
-        if ((type == MatType.INK_SACK) || (type == MatType.DYE)) {
+        if (type == MatType.INK_SACK) {
             if (dye == DyeColorWrapper.WHITE) {
                 material = Material.BONE_MEAL;
             } else if (dye == DyeColorWrapper.YELLOW) {
-                material = Material.DANDELION_YELLOW;
+                material = Material.DANDELION;
             } else if (dye == DyeColorWrapper.BLUE) {
                 material = Material.LAPIS_LAZULI;
             } else if (dye == DyeColorWrapper.BROWN) {
                 material = Material.COCOA_BEANS;
             } else if (dye == DyeColorWrapper.GREEN) {
-                material = Material.CACTUS_GREEN;
+                material = Material.CACTUS;
             } else if (dye == DyeColorWrapper.RED) {
-                material = Material.ROSE_RED;
+                material = Material.ROSE_BUSH;
             } else if (dye == DyeColorWrapper.BLACK) {
                 material = Material.INK_SAC;
             } else {

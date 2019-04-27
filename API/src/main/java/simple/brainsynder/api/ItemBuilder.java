@@ -15,6 +15,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import simple.brainsynder.Core;
 import simple.brainsynder.nbt.StorageTagCompound;
 import simple.brainsynder.nbt.StorageTagList;
 import simple.brainsynder.nbt.StorageTagString;
@@ -119,7 +120,14 @@ public class ItemBuilder {
 
         int amount = 1;
         if (json.containsKey("amount")) amount = Integer.parseInt(String.valueOf(json.get("amount")));
-        Material material = Material.valueOf(String.valueOf(json.get("material")));
+        String materialName = String.valueOf(json.get("material"));
+        Material material = null;
+        try {
+            material = Material.valueOf(materialName);
+        }catch (Exception e) {
+            material = Material.AIR;
+            Core.getInstance().getLogger().warning("Could not find '"+materialName+"' for version "+ServerVersion.getVersion().name());
+        }
         ItemBuilder builder = new ItemBuilder(material, amount);
 
         if (json.containsKey("name")) builder.withName(String.valueOf(json.get("name")));

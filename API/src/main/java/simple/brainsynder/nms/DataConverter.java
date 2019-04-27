@@ -11,6 +11,7 @@ import simple.brainsynder.utils.SkullType;
 
 public class DataConverter {
     public Data getColoredMaterial(MatType type, int data) {
+        if (type == MatType.DYE) type = MatType.INK_SACK;
         return new Data(findMaterial(type.name()), data);
     }
 
@@ -113,6 +114,10 @@ public class DataConverter {
         public Data(Material material, int data) {
             this.material = material;
             this.data = data;
+        }
+
+        public Data() {
+            this.material = Material.AIR;
         }
 
         void setData(int data) {
