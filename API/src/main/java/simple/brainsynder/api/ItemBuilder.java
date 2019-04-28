@@ -491,6 +491,10 @@ public class ItemBuilder {
         return main.isSimilar(check);
     }
 
+    public ItemStack getRawItem() {
+        return is;
+    }
+
     /**
      * @Deprecated
      *   This method does not save the data changed for the Meta, It will in the future save it.
