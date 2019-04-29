@@ -13,3 +13,5 @@ wget https://mcmirror.io/files/Spigot/Spigot-1.13-fe3ab0d_f41aae4-20180815-2348.
 mv libs/Spigot-1.13-fe3ab0d_f41aae4-20180815-2348.jar libs/craftbukkit-1.13-R0.1-SNAPSHOT.jar
 wget https://mcmirror.io/files/Spigot/Spigot-1.13.2-a1f2566-20181123-1027.jar -P libs/
 mv libs/Spigot-1.13.2-a1f2566-20181123-1027.jar libs/craftbukkit-1.13.1-R0.1-SNAPSHOT.jar
+wget https://mcmirror.io/files/Spigot/Spigot-1.14-0c02b0c-20190425-0538.jar -P libs/
+mv libs/Spigot-1.14-0c02b0c-20190425-0538.jar libs/craftbukkit-1.13.1-R0.1-SNAPSHOT.jar
