@@ -21,7 +21,7 @@ import simple.brainsynder.nbt.StorageTagList;
 import simple.brainsynder.nbt.StorageTagString;
 import simple.brainsynder.nms.DataConverter;
 import simple.brainsynder.nms.materials.*;
-import simple.brainsynder.nms.materials.types.SandType;
+import simple.brainsynder.nms.materials.types.*;
 import simple.brainsynder.reflection.FieldAccessor;
 import simple.brainsynder.utils.*;
 
@@ -115,17 +115,62 @@ public class ItemBuilder {
         return builder;
     }
 
+    private static DataConverter.Data translate (String material, int data) {
+        DataConverter converter = getConverter();
+        if (ServerVersion.isEqualNew(ServerVersion.v1_13_R1)) {
+            for (MatType type : MatType.values()) {
+                if (type.name().equalsIgnoreCase(material)) {
+                    return converter.getColoredMaterial(type, data);
+                }
+            }
+            String rawMat = material.toUpperCase();
+
+            if (rawMat.contains("BARDING"))
+                return new DataConverter.Data(converter.findMaterial(rawMat.replace("BARDING", "HORSE_ARMOR")), 0);
+
+            switch (rawMat) {
+                case "SKULL_ITEM": return converter.getSkullMaterial(SkullType.values()[data]);
+                case "COAL": return converter.getMaterial(CoalType.values()[data]);
+                case "COBBLE_WALL": return converter.getMaterial(CoalType.values()[data]);
+                case "DIRT": return converter.getMaterial(CoalType.values()[data]);
+                case "YELLOW_FLOWER": return converter.getMaterial(FlowerType.DANDELION);
+                case "RED_ROSE": return converter.getMaterial(FlowerType.values()[data+1]);
+                case "GOLDEN_APPLE": return converter.getMaterial(GoldAppleType.values()[data]);
+                case "LONG_GRASS": return converter.getMaterial(GrassType.values()[data]);
+                case "PRISMARINE": return converter.getMaterial(PrismarineType.values()[data]);
+                case "QUARTZ_BLOCK": return converter.getMaterial(QuartzType.values()[data]);
+                case "SAND": return converter.getMaterial(SandType.values()[data]);
+                case "SPONGE": return converter.getMaterial(SpongeType.values()[data]);
+                case "SMOOTH_BRICK": return converter.getMaterial(StoneBrickType.values()[data]);
+                case "STONE": return converter.getMaterial(StoneType.values()[data]);
+                case "DOUBLE_PLANT": return converter.getMaterial(TallPlantType.values()[data]);
+                case "COMMAND": return new DataConverter.Data(converter.findMaterial("COMMAND_BLOCK"), 0);
+                case "EYE_OF_ENDER": return new DataConverter.Data(converter.findMaterial("ENDER_EYE"), 0);
+                case "PORK": return new DataConverter.Data(converter.findMaterial("PORKCHOP"), 0);
+                case "GRILLED_PORK": return new DataConverter.Data(converter.findMaterial("COOKED_PORKCHOP"), 0);
+                case "SULPHUR": return new DataConverter.Data(converter.findMaterial("GUNPOWDER"), 0);
+            }
+        }
+
+        return null;
+    }
+
     public static ItemBuilder fromJSON (JSONObject json) {
         if (!json.containsKey("material")) throw new NullPointerException("JSONObject seems to be missing speed material");
 
         int amount = 1;
         if (json.containsKey("amount")) amount = Integer.parseInt(String.valueOf(json.get("amount")));
         String materialName = String.valueOf(json.get("material"));
+        int rawData = Integer.parseInt(String.valueOf(json.getOrDefault("data", "0")));
         Material material = null;
         try {
             material = Material.valueOf(materialName);
         }catch (Exception e) {
-            material = Material.AIR;
+            DataConverter.Data data = translate(materialName, rawData);
+            if (data == null)
+                throw new NullPointerException("Could not find '"+materialName+"' for version "+ServerVersion.getVersion().name());
+            material = data.getMaterial();
+            rawData = data.getData();
             Core.getInstance().getLogger().warning("Could not find '"+materialName+"' for version "+ServerVersion.getVersion().name());
         }
         ItemBuilder builder = new ItemBuilder(material, amount);
@@ -136,7 +181,7 @@ public class ItemBuilder {
             lore.addAll(((JSONArray)json.get("lore")));
             builder.withLore(lore);
         }
-        if (json.containsKey("data")) builder.withData(Integer.parseInt(String.valueOf(json.get("data"))));
+        if (json.containsKey("data")) builder.withData(rawData);
 
         if (json.containsKey("enchants")) {
             JSONArray array = (JSONArray) json.get("enchants");
