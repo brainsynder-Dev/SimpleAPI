@@ -15,7 +15,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.material.MaterialData;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import simple.brainsynder.Core;
 import simple.brainsynder.nbt.StorageTagCompound;
 import simple.brainsynder.nbt.StorageTagList;
 import simple.brainsynder.nbt.StorageTagString;
@@ -131,8 +130,8 @@ public class ItemBuilder {
             switch (rawMat) {
                 case "SKULL_ITEM": return converter.getSkullMaterial(SkullType.values()[data]);
                 case "COAL": return converter.getMaterial(CoalType.values()[data]);
-                case "COBBLE_WALL": return converter.getMaterial(CoalType.values()[data]);
-                case "DIRT": return converter.getMaterial(CoalType.values()[data]);
+                case "COBBLE_WALL": return converter.getMaterial(CobbleWallType.values()[data]);
+                case "DIRT": return converter.getMaterial(DirtType.values()[data]);
                 case "YELLOW_FLOWER": return converter.getMaterial(FlowerType.DANDELION);
                 case "RED_ROSE": return converter.getMaterial(FlowerType.values()[data+1]);
                 case "GOLDEN_APPLE": return converter.getMaterial(GoldAppleType.values()[data]);
@@ -171,7 +170,6 @@ public class ItemBuilder {
                 throw new NullPointerException("Could not find '"+materialName+"' for version "+ServerVersion.getVersion().name());
             material = data.getMaterial();
             rawData = data.getData();
-            Core.getInstance().getLogger().warning("Could not find '"+materialName+"' for version "+ServerVersion.getVersion().name());
         }
         ItemBuilder builder = new ItemBuilder(material, amount);
 
