@@ -273,13 +273,10 @@ public class StorageTagCompound extends StorageBase {
      * Retrieves a byte value using the specified key, or 0 if no such key was stored.
      */
     public byte getByte(String key) {
-        try {
-            if (this.hasKey(key, 99)) {
-                return ((StoragePrimitive) this.tagMap.get(key)).getByte();
-            }
-        } catch (ClassCastException ignored) {
+        StorageBase storage = this.tagMap.get(key);
+        if (storage.getId() == 1) {
+            return ((StorageTagByte)storage).getByte();
         }
-
         return 0;
     }
 
@@ -287,83 +284,42 @@ public class StorageTagCompound extends StorageBase {
      * Retrieves a short value using the specified key, or 0 if no such key was stored.
      */
     public short getShort(String key) {
-        try {
-            if (this.hasKey(key, 99)) {
-                return ((StoragePrimitive) this.tagMap.get(key)).getShort();
-            }
-        } catch (ClassCastException ignored) {
-        }
-
-        return 0;
+        return Short.parseShort(getValue(key));
     }
 
     /**
      * Retrieves an integer value using the specified key, or 0 if no such key was stored.
      */
     public int getInteger(String key) {
-        try {
-            if (this.hasKey(key, 99)) {
-                return ((StoragePrimitive) this.tagMap.get(key)).getInt();
-            }
-        } catch (ClassCastException ignored) {
-        }
-
-        return 0;
+        return Integer.parseInt(getValue(key));
     }
 
     /**
      * Retrieves a long value using the specified key, or 0 if no such key was stored.
      */
     public long getLong(String key) {
-        try {
-            if (this.hasKey(key, 99)) {
-                return ((StoragePrimitive) this.tagMap.get(key)).getLong();
-            }
-        } catch (ClassCastException ignored) {
-        }
-
-        return 0L;
+        return Long.parseLong(getValue(key));
     }
 
     /**
      * Retrieves a float value using the specified key, or 0 if no such key was stored.
      */
     public float getFloat(String key) {
-        try {
-            if (this.hasKey(key, 99)) {
-                return ((StoragePrimitive) this.tagMap.get(key)).getFloat();
-            }
-        } catch (ClassCastException ignored) {
-        }
-
-        return 0.0F;
+        return Float.parseFloat(getValue(key));
     }
 
     /**
      * Retrieves a double value using the specified key, or 0 if no such key was stored.
      */
     public double getDouble(String key) {
-        try {
-            if (this.hasKey(key, 99)) {
-                return ((StoragePrimitive) this.tagMap.get(key)).getDouble();
-            }
-        } catch (ClassCastException ignored) {
-        }
-
-        return 0.0D;
+        return Double.parseDouble(getValue(key));
     }
 
     /**
      * Retrieves a string value using the specified key, or an empty string if no such key was stored.
      */
     public String getString(String key) {
-        try {
-            if (this.hasKey(key, 8)) {
-                return this.tagMap.get(key).getString();
-            }
-        } catch (ClassCastException ignored) {
-        }
-        return "";
+        return getValue(key);
     }
 
     public String getValue(String key) {
@@ -483,12 +439,7 @@ public class StorageTagCompound extends StorageBase {
      * method.
      */
     public boolean getBoolean(String key) {
-        try {
-            if (this.hasKey(key, 99)) {
-                return (((StorageTagByte)this.tagMap.get(key)).getByte() == 1);
-            }
-        } catch (ClassCastException ignored) {}
-        return false;
+        return getByte(key) != 0;
     }
 
     /**

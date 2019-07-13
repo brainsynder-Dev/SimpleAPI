@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class JsonToNBT {
-    private static final Pattern PATTERN = Pattern.compile("[-+]?(?:[0-9]+[.]|[0-9]*[.][0-9]+)(?:e[-+]?[0-9]+)?", 2);
-    private static final Pattern PATTERN1 = Pattern.compile("[-+]?(?:[0-9]+[.]?|[0-9]*[.][0-9]+)(?:e[-+]?[0-9]+)?d", 2);
-    private static final Pattern PATTERN2 = Pattern.compile("[-+]?(?:[0-9]+[.]?|[0-9]*[.][0-9]+)(?:e[-+]?[0-9]+)?f", 2);
-    private static final Pattern PATTERN3 = Pattern.compile("[-+]?(?:0|[1-9][0-9]*)b", 2);
-    private static final Pattern PATTERN4 = Pattern.compile("[-+]?(?:0|[1-9][0-9]*)l", 2);
-    private static final Pattern PATTERN5 = Pattern.compile("[-+]?(?:0|[1-9][0-9]*)s", 2);
-    private static final Pattern PATTERN6 = Pattern.compile("[-+]?(?:0|[1-9][0-9]*)");
+    private static final Pattern DOUBLE_PATTERN2 = Pattern.compile("[-+]?(?:[0-9]+[.]|[0-9]*[.][0-9]+)(?:e[-+]?[0-9]+)?", 2);
+    private static final Pattern DOUBLE_PATTERN = Pattern.compile("[-+]?(?:[0-9]+[.]?|[0-9]*[.][0-9]+)(?:e[-+]?[0-9]+)?d", 2);
+    private static final Pattern FLOAT_PATTERN = Pattern.compile("[-+]?(?:[0-9]+[.]?|[0-9]*[.][0-9]+)(?:e[-+]?[0-9]+)?f", 2);
+    private static final Pattern BYTE_PATTERN = Pattern.compile("[-+]?(?:0|[1-9][0-9]*)b", 2);
+    private static final Pattern LONG_PATTERN = Pattern.compile("[-+]?(?:0|[1-9][0-9]*)l", 2);
+    private static final Pattern SHORT_PATTERN = Pattern.compile("[-+]?(?:0|[1-9][0-9]*)s", 2);
+    private static final Pattern INT_PATTERN = Pattern.compile("[-+]?(?:0|[1-9][0-9]*)");
     private final String text;
     private int place;
 
@@ -68,31 +68,35 @@ public class JsonToNBT {
 
     private StorageBase c(String value) {
         try {
-            if (PATTERN2.matcher(value).matches()) {
+            if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+                return new StorageTagByte((byte)(Boolean.getBoolean(value) ? 1 : 0));
+            }
+
+            if (FLOAT_PATTERN.matcher(value).matches()) {
                 return new StorageTagFloat(Float.parseFloat(value.substring(0, value.length() - 1)));
             }
 
-            if (PATTERN3.matcher(value).matches()) {
+            if (BYTE_PATTERN.matcher(value).matches()) {
                 return new StorageTagByte(Byte.parseByte(value.substring(0, value.length() - 1)));
             }
 
-            if (PATTERN4.matcher(value).matches()) {
+            if (LONG_PATTERN.matcher(value).matches()) {
                 return new StorageTagLong(Long.parseLong(value.substring(0, value.length() - 1)));
             }
 
-            if (PATTERN5.matcher(value).matches()) {
+            if (SHORT_PATTERN.matcher(value).matches()) {
                 return new StorageTagShort(Short.parseShort(value.substring(0, value.length() - 1)));
             }
 
-            if (PATTERN6.matcher(value).matches()) {
+            if (INT_PATTERN.matcher(value).matches()) {
                 return new StorageTagInt(Integer.parseInt(value));
             }
 
-            if (PATTERN1.matcher(value).matches()) {
+            if (DOUBLE_PATTERN.matcher(value).matches()) {
                 return new StorageTagDouble(Double.parseDouble(value.substring(0, value.length() - 1)));
             }
 
-            if (PATTERN.matcher(value).matches()) {
+            if (DOUBLE_PATTERN2.matcher(value).matches()) { //Without the d (EG: 1.0d -> 1.0)
                 return new StorageTagDouble(Double.parseDouble(value));
             }
         } catch (NumberFormatException ignored) {}
