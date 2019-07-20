@@ -149,6 +149,15 @@ public class ItemBuilder {
                 case "GRILLED_PORK": return new DataConverter.Data(converter.findMaterial("COOKED_PORKCHOP"), 0);
                 case "SULPHUR": return new DataConverter.Data(converter.findMaterial("GUNPOWDER"), 0);
             }
+        }else{
+            if (material.toUpperCase().startsWith("LEGACY_")) {
+                Material mat = converter.findMaterial(material.toUpperCase().replace("LEGACY_", ""));
+                return new DataConverter.Data(mat, data);
+            }
+            for (SkullType type : SkullType.values()) {
+                if (material.toUpperCase().contains(type.name()))
+                    return new DataConverter.Data(Material.valueOf("SKULL_ITEM"), type.ordinal());
+            }
         }
 
         return null;
