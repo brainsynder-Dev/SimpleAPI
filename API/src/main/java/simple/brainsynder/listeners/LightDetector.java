@@ -13,8 +13,8 @@ import org.bukkit.inventory.ItemStack;
 import simple.brainsynder.Core;
 import simple.brainsynder.api.ItemMaker;
 import simple.brainsynder.nms.ITellraw;
-import simple.brainsynder.utils.Perms;
 import simple.brainsynder.utils.Reflection;
+import simple.brainsynder.utils.plugin_use.Perms;
 
 import java.util.HashMap;
 import java.util.Map;

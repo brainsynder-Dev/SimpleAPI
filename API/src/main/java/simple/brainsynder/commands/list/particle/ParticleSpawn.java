@@ -7,7 +7,7 @@ import simple.brainsynder.Core;
 import simple.brainsynder.api.ParticleMaker;
 import simple.brainsynder.commands.SubCommand;
 import simple.brainsynder.commands.annotations.ICommand;
-import simple.brainsynder.files.Language;
+import simple.brainsynder.files.plugin_use.Language;
 import simple.brainsynder.nms.IParticleSender;
 import simple.brainsynder.wrappers.ColorWrapper;
 

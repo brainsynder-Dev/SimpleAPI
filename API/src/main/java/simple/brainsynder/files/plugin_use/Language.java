@@ -1,10 +1,11 @@
-package simple.brainsynder.files;
+package simple.brainsynder.files.plugin_use;
 
 import simple.brainsynder.Core;
+import simple.brainsynder.files.FileMaker;
 
 import java.util.Arrays;
 
-public class Language extends FileMaker{
+public class Language extends FileMaker {
     private Core _core;
     public static String NOPERMISSION = "No-Permission";
     public static String NOT_SUPPORTED = "Version-Not-Supported";

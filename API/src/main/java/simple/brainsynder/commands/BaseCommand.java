@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import simple.brainsynder.Core;
-import simple.brainsynder.files.Language;
+import simple.brainsynder.files.plugin_use.Language;
 
 /**
  * This will be removed some time in the future, please use the new command system

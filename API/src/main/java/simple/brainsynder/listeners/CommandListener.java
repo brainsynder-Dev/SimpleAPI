@@ -6,8 +6,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import simple.brainsynder.Core;
-import simple.brainsynder.files.Language;
-import simple.brainsynder.utils.Logger;
+import simple.brainsynder.files.plugin_use.Language;
+import simple.brainsynder.utils.plugin_use.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

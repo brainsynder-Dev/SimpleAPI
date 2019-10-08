@@ -21,8 +21,8 @@ import simple.brainsynder.api.ItemMaker;
 import simple.brainsynder.events.SkullTextureEvent;
 import simple.brainsynder.nms.ITellraw;
 import simple.brainsynder.nms.ITileEntitySkull;
-import simple.brainsynder.utils.Perms;
 import simple.brainsynder.utils.Reflection;
+import simple.brainsynder.utils.plugin_use.Perms;
 
 import java.util.Collection;
 

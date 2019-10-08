@@ -1,4 +1,4 @@
-package simple.brainsynder.utils;
+package simple.brainsynder.utils.plugin_use;
 
 public class Perms {
     public static final Permission.Validator ACTION = new Permission.Validator("SimpleAPI.command.action");

@@ -6,11 +6,11 @@ import org.bukkit.entity.Player;
 import simple.brainsynder.Core;
 import simple.brainsynder.commands.ParentCommand;
 import simple.brainsynder.commands.annotations.ICommand;
-import simple.brainsynder.files.Language;
+import simple.brainsynder.files.plugin_use.Language;
 import simple.brainsynder.nms.IActionMessage;
 import simple.brainsynder.nms.ITellraw;
-import simple.brainsynder.utils.Logger;
 import simple.brainsynder.utils.Reflection;
+import simple.brainsynder.utils.plugin_use.Logger;
 
 @ICommand (
         name = "action",

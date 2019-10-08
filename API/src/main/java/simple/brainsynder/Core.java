@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import simple.brainsynder.api.ItemMaker;
 import simple.brainsynder.commands.CommandRegistry;
 import simple.brainsynder.commands.list.*;
-import simple.brainsynder.files.Language;
+import simple.brainsynder.files.plugin_use.Language;
 import simple.brainsynder.listeners.CommandListener;
 import simple.brainsynder.listeners.JoinListener;
 import simple.brainsynder.listeners.LightDetector;

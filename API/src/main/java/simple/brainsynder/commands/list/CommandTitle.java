@@ -7,12 +7,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 import simple.brainsynder.Core;
 import simple.brainsynder.commands.BaseCommand;
-import simple.brainsynder.files.Language;
+import simple.brainsynder.files.plugin_use.Language;
 import simple.brainsynder.nms.ITellraw;
 import simple.brainsynder.nms.ITitleMessage;
-import simple.brainsynder.utils.Logger;
-import simple.brainsynder.utils.Perms;
 import simple.brainsynder.utils.Reflection;
+import simple.brainsynder.utils.plugin_use.Logger;
+import simple.brainsynder.utils.plugin_use.Perms;
 
 public class CommandTitle extends BaseCommand {
     public CommandTitle() {

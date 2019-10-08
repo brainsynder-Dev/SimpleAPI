@@ -1,4 +1,4 @@
-package simple.brainsynder.utils;
+package simple.brainsynder.utils.plugin_use;
 
 import org.bukkit.entity.Player;
 

@@ -10,11 +10,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.scheduler.BukkitRunnable;
 import simple.brainsynder.Core;
-import simple.brainsynder.files.Language;
+import simple.brainsynder.files.plugin_use.Language;
 import simple.brainsynder.nms.ITellraw;
-import simple.brainsynder.utils.Perms;
 import simple.brainsynder.utils.Reflection;
 import simple.brainsynder.utils.SpigotPluginHandler;
+import simple.brainsynder.utils.plugin_use.Perms;
 
 import java.util.concurrent.CompletableFuture;
 

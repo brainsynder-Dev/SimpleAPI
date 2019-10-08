@@ -13,6 +13,7 @@ package simple.brainsynder.api;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+@Deprecated
 public interface Trailer {
 	Player getPlayer ();
 	ParticleMaker getParticles ();
