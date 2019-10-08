@@ -3,6 +3,7 @@ package simple.brainsynder.commands.list;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import simple.brainsynder.Core;
 import simple.brainsynder.api.WebAPI;
 import simple.brainsynder.commands.ParentCommand;
 import simple.brainsynder.commands.annotations.ICommand;
@@ -33,7 +34,7 @@ public class CommandHistory extends ParentCommand {
 
         String username = ChatColor.stripColor(args[0]);
         sender.sendMessage("§3Loading name history for: " + username);
-        WebAPI.findHistory(username, names -> {
+        WebAPI.findHistory(username, Core.getInstance(),names -> {
             if (names.isEmpty()) {
                 sender.sendMessage("§cError: §7An error occurred when connecting to minecraftchar.us, Is the username correct?");
                 return;

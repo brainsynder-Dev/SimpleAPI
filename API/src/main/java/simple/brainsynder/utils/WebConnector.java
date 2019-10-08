@@ -1,7 +1,7 @@
 package simple.brainsynder.utils;
 
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import simple.brainsynder.Core;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +13,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class WebConnector {
-    public static void getOutputStream (String link, Return<OutputStream> streamReturn) {
+    public static void getOutputStream (String link, Plugin plugin, Return<OutputStream> streamReturn) {
         CompletableFuture.runAsync(() -> {
             try {
                 System.setProperty("http.agent", "Chrome");
@@ -34,12 +34,12 @@ public class WebConnector {
                             e.printStackTrace();
                         }
                     }
-                }.runTask(Core.getInstance());
+                }.runTask(plugin);
             } catch (Exception ignored) {}
         });
     }
 
-    public static void getInputStream (String link, Return<InputStream> streamReturn) {
+    public static void getInputStream (String link, Plugin plugin, Return<InputStream> streamReturn) {
         CompletableFuture.runAsync(() -> {
             try {
                 System.setProperty("http.agent", "Chrome");
@@ -60,7 +60,7 @@ public class WebConnector {
                             e.printStackTrace();
                         }
                     }
-                }.runTask(Core.getInstance());
+                }.runTask(plugin);
             } catch (Exception ignored) {}
         });
     }

@@ -30,6 +30,7 @@ public class Core extends JavaPlugin {
     
     @Override
     public void onEnable() {
+        getLogger().warning("THIS VERSION MIGHT BREAK A FEW PLUGINS, USE AT YOUR OWN DISCRETION");
         SpigotPluginHandler spigotPluginHandler = new SpigotPluginHandler(this, 24671, SpigotPluginHandler.MetricType.BSTATS);
         SpigotPluginHandler.registerPlugin(spigotPluginHandler);
 

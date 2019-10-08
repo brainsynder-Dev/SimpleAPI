@@ -17,7 +17,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import simple.brainsynder.Core;
 import simple.brainsynder.nms.IParticleSender;
 import simple.brainsynder.storage.TriLoc;
 import simple.brainsynder.utils.ServerVersion;
@@ -208,44 +207,37 @@ public class ParticleMaker {
     }
 
     public void sendToPlayer(Player player) {
-        if (!Core.getInstance().getLagCheck().isLagging()) {
-            try {
-                Object packet = createPacket(player.getLocation());
-                if (colored) {
-                    for (int i = 0; i < repeatAmount; i++) {
-                        Reflection.sendPacket(player, packet);
-                    }
-                    return;
+        try {
+            Object packet = createPacket(player.getLocation());
+            if (colored) {
+                for (int i = 0; i < repeatAmount; i++) {
+                    Reflection.sendPacket(player, packet);
                 }
-                Reflection.sendPacket(player, packet);
-            } catch (Exception ignored) {
+                return;
             }
-
+            Reflection.sendPacket(player, packet);
+        } catch (Exception ignored) {
         }
     }
 
     public void sendToPlayer(Player player, Location location) {
-        if (!Core.getInstance().getLagCheck().isLagging()) {
-            try {
-                Object packet = createPacket(location);
-                if (colored) {
-                    for (int i = 0; i < repeatAmount; i++) {
-                        Reflection.sendPacket(player, packet);
-                    }
-                    return;
+        try {
+            Object packet = createPacket(location);
+            if (colored) {
+                for (int i = 0; i < repeatAmount; i++) {
+                    Reflection.sendPacket(player, packet);
                 }
-                Reflection.sendPacket(player, packet);
-            } catch (Exception e) {
-                e.printStackTrace();
+                return;
             }
+            Reflection.sendPacket(player, packet);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     public void sendToPlayers(List<Player> players, Location location) {
-        if (!Core.getInstance().getLagCheck().isLagging()) {
-            for (Player player : players) {
-                sendToPlayer(player, location);
-            }
+        for (Player player : players) {
+            sendToPlayer(player, location);
         }
     }
 

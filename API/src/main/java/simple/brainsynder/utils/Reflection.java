@@ -17,7 +17,6 @@ import org.bukkit.block.Skull;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import simple.brainsynder.Core;
 import simple.brainsynder.nms.*;
 import simple.brainsynder.nms.key.*;
 
@@ -53,7 +52,6 @@ public class Reflection {
         tabMessage = null;
         particlePacket = null;
         converter = null;
-        ClassLoader loader = Core.getInstance().getLoader();
         List<Class<?>> classes = new ArrayList<>();
 
         for (String name : Arrays.asList(
@@ -72,7 +70,7 @@ public class Reflection {
                 "DataConverterHandler"
         )) {
             try {
-                Class<?> clazz = Class.forName("simple.brainsynder.nms." + getVersion() + "." + name, false, loader);
+                Class<?> clazz = Class.forName("simple.brainsynder.nms." + getVersion() + "." + name);
                 classes.add(clazz);
             } catch (Exception ignored) {
             }

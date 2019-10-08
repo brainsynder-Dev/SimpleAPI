@@ -7,11 +7,11 @@ import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import simple.brainsynder.Core;
 import simple.brainsynder.storage.ExpireHashMap;
 import simple.brainsynder.utils.*;
 
@@ -31,19 +31,19 @@ public class WebAPI {
     private static AdvMap<String, ExpireHashMap<Type, String>> cache = new AdvMap<>();
     private static String steveTexture = Base64Wrapper.encodeString("{'textures':{'SKIN':{'url':'http://textures.minecraft.net/texture/456eec1c2169c8c60a7ae436abcd2dc5417d56f8adef84f11343dc1188fe138'}}}");
 
-    public static void findHistory(String name, ReturnValue<List<String>> returnValue) {
-        findHistory(name, returnValue, Throwable::printStackTrace);
+    public static void findHistory(String name, Plugin plugin, ReturnValue<List<String>> returnValue) {
+        findHistory(name, plugin, returnValue, Throwable::printStackTrace);
     }
 
-    public static void findProfile(String name, ReturnValue<JSONObject> returnValue) {
-        findProfile(name, returnValue, Throwable::printStackTrace);
+    public static void findProfile(String name, Plugin plugin, ReturnValue<JSONObject> returnValue) {
+        findProfile(name, plugin, returnValue, Throwable::printStackTrace);
     }
 
-    public static void findTexture(String name, ReturnValue<String> returnValue) {
-        findTexture(name, returnValue, Throwable::printStackTrace);
+    public static void findTexture(String name, Plugin plugin, ReturnValue<String> returnValue) {
+        findTexture(name, plugin, returnValue, Throwable::printStackTrace);
     }
 
-    public static void findHistory(String name, ReturnValue<List<String>> returnValue, ReturnValue<Throwable> onFailure) {
+    public static void findHistory(String name, Plugin plugin, ReturnValue<List<String>> returnValue, ReturnValue<Throwable> onFailure) {
         CompletableFuture.runAsync(() -> {
             LinkedList<String> names = new LinkedList<>();
             try {
@@ -65,19 +65,19 @@ public class WebAPI {
                     public void run() {
                         returnValue.run(names);
                     }
-                }.runTask(Core.getInstance());
+                }.runTask(plugin);
             } catch (Exception e) {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         onFailure.run(e);
                     }
-                }.runTask(Core.getInstance());
+                }.runTask(plugin);
             }
         });
     }
 
-    public static void findTexture(String name, ReturnValue<String> returnValue, ReturnValue<Throwable> onFailure) {
+    public static void findTexture(String name, Plugin plugin, ReturnValue<String> returnValue, ReturnValue<Throwable> onFailure) {
         CompletableFuture.runAsync(() -> {
             try {
                 InputStream inputStream = WebConnector.getInputStream("https://v2.minecraftchar.us/textureurl/?user=" + name);
@@ -88,19 +88,19 @@ public class WebAPI {
                     public void run() {
                         returnValue.run(texture);
                     }
-                }.runTask(Core.getInstance());
+                }.runTask(plugin);
             } catch (Exception e) {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         onFailure.run(e);
                     }
-                }.runTask(Core.getInstance());
+                }.runTask(plugin);
             }
         });
     }
 
-    public static void findProfile(String name, ReturnValue<JSONObject> returnValue, ReturnValue<Throwable> onFailure) {
+    public static void findProfile(String name, Plugin plugin, ReturnValue<JSONObject> returnValue, ReturnValue<Throwable> onFailure) {
         CompletableFuture.runAsync(() -> {
             try {
                 JSONObject profile = new JSONObject();
@@ -116,14 +116,14 @@ public class WebAPI {
                     public void run() {
                         returnValue.run(profile);
                     }
-                }.runTask(Core.getInstance());
+                }.runTask(plugin);
             } catch (Exception e) {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
                         onFailure.run(e);
                     }
-                }.runTask(Core.getInstance());
+                }.runTask(plugin);
             }
         });
     }
