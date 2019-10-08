@@ -29,8 +29,15 @@ public abstract class JSONFile {
      * @param file The file where the data is kept
      */
     public JSONFile(File file) {
+        this(file, true);
+    }
+    public JSONFile(File file, boolean loadDefaults) {
         this.file = file;
-        reload();
+        if (loadDefaults) reload();
+    }
+
+    public String getName () {
+        return file.getName().replace(".json", "");
     }
 
     /**
