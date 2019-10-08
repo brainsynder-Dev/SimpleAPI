@@ -6,9 +6,9 @@
     <parent>
         <artifactId>SimpleAPI-CORE</artifactId>
         <groupId>simple.brainsynder</groupId>
-        <version>3.8.9-SNAPSHOT</version>
+        <version>3.9-SNAPSHOT</version>
     </parent>
-    <version>1</version>
+    <version>2</version>
     <packaging>jar</packaging>
 
     <artifactId>v1_14_R1</artifactId>
