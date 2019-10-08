@@ -21,7 +21,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import simple.brainsynder.exceptions.TamperException;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
@@ -221,60 +220,62 @@ public class SpigotPluginHandler implements Listener {
         return plugin;
     }
 
+    @Deprecated
     public boolean runTamperCheck(String author, String name, String version) {
         PluginDescriptionFile pdf = plugin.getDescription();
         try {
             if (author != null)
                 if (!pdf.getAuthors().contains(author)) {
                     plugin.getServer().getPluginManager().disablePlugin(plugin);
-                    throw new TamperException("Plugin.yml has been tampered with, Cause: Original author not found.");
+                    throw new IllegalAccessException("Plugin.yml has been tampered with, Cause: Original author not found.");
                 }
             if (author != null)
                 if (pdf.getAuthors().size() != 1) {
                     plugin.getServer().getPluginManager().disablePlugin(plugin);
-                    throw new TamperException("Plugin.yml has been tampered with, Cause: More than 1 author.");
+                    throw new IllegalAccessException("Plugin.yml has been tampered with, Cause: More than 1 author.");
                 }
             if (name != null)
                 if (!pdf.getName().equals(name)) {
                     plugin.getServer().getPluginManager().disablePlugin(plugin);
-                    throw new TamperException("Plugin.yml has been tampered with, Cause: Plugin name does not match.");
+                    throw new IllegalAccessException("Plugin.yml has been tampered with, Cause: Plugin name does not match.");
                 }
             if (version != null)
                 if (!pdf.getVersion().equals(version)) {
                     plugin.getServer().getPluginManager().disablePlugin(plugin);
-                    throw new TamperException("Plugin.yml has been tampered with, Cause: Versions do not match.");
+                    throw new IllegalAccessException("Plugin.yml has been tampered with, Cause: Versions do not match.");
                 }
-        } catch (TamperException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
             return false;
         }
         return true;
     }
 
+    @Deprecated
     public boolean runTamperCheck(List<String> authors, String name, String version) {
         PluginDescriptionFile pdf = plugin.getDescription();
         try {
             if (authors != null) {
                 if (!pdf.getAuthors().equals(authors)) {
                     plugin.getServer().getPluginManager().disablePlugin(plugin);
-                    throw new TamperException("Plugin.yml has been tampered with, Cause: Original author not found.");
+                    throw new IllegalAccessException("Plugin.yml has been tampered with, Cause: Original author not found.");
                 }
                 if (pdf.getAuthors().size() != authors.size()) {
                     plugin.getServer().getPluginManager().disablePlugin(plugin);
-                    throw new TamperException("Plugin.yml has been tampered with, Cause: More than " + authors.size() + " author.");
+                    throw new IllegalAccessException("Plugin.yml has been tampered with, Cause: More than " + authors.size() + " author.");
                 }
             }
             if (name != null)
                 if (!pdf.getName().equals(name)) {
                     plugin.getServer().getPluginManager().disablePlugin(plugin);
-                    throw new TamperException("Plugin.yml has been tampered with, Cause: Plugin name does not match.");
+                    throw new IllegalAccessException("Plugin.yml has been tampered with, Cause: Plugin name does not match.");
                 }
             if (version != null)
                 if (!pdf.getVersion().equals(version)) {
                     plugin.getServer().getPluginManager().disablePlugin(plugin);
-                    throw new TamperException("Plugin.yml has been tampered with, Cause: Versions do not match.");
+                    throw new IllegalAccessException("Plugin.yml has been tampered with, Cause: Versions do not match.");
                 }
-        } catch (TamperException e) {
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
             return false;
         }
