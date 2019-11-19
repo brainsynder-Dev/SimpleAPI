@@ -4,11 +4,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.*;
 import simple.brainsynder.exceptions.SimpleAPIException;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -115,7 +114,7 @@ public class StorageTagCompound extends StorageBase {
 
             while ((b0 = readType(input, sizeTracker)) != 0) {
                 String s = readKey(input, sizeTracker);
-                sizeTracker.read((long) (224 + 16 * s.length()));
+                sizeTracker.read(224 + 16 * s.length());
                 StorageBase nbtbase = readNBT(b0, s, input, depth + 1, sizeTracker);
 
                 if (this.tagMap.put(s, nbtbase) != null) {
@@ -268,6 +267,57 @@ public class StorageTagCompound extends StorageBase {
             return i == 1 || i == 2 || i == 3 || i == 4 || i == 5 || i == 6;
         }
     }
+    
+    public void setLocation (String key, Location location) {
+        StorageTagCompound compound = new StorageTagCompound();
+        compound.setString("world", location.getWorld().getName());
+        compound.setDouble("x", location.getX());
+        compound.setDouble("y", location.getY());
+        compound.setDouble("z", location.getZ());
+        compound.setFloat("yaw", location.getYaw());
+        compound.setFloat("pitch", location.getPitch());
+        setTag(key, compound);
+    }
+    public Location getLocation (String key) {
+        StorageTagCompound compound = getCompoundTag(key);
+        World world = Bukkit.getWorld(compound.getString("world", "world"));
+        double x = compound.getDouble("x", 0);
+        double y = compound.getDouble("y", 0);
+        double z = compound.getDouble("z", 0);
+        float yaw = compound.getFloat("yaw", 0f);
+        float pitch = compound.getFloat("pitch", 0f);
+        return new Location(world, x, y, z, yaw, pitch);
+    }
+    public Location getLocation (String key, Location fallback) {
+        return (hasKey(key) ? getLocation(key) : fallback);
+    }
+    
+    public void setColor (String key, Color color) {
+        StorageTagCompound compound = new StorageTagCompound();
+        compound.setInteger("r", color.getRed());
+        compound.setInteger("g", color.getGreen());
+        compound.setInteger("b", color.getBlue());
+        setTag(key, compound);
+    }
+    public Color getColor (String key) {
+        StorageTagCompound compound = getCompoundTag(key);
+        int r = compound.getInteger("r", 0);
+        if (r > 255) r = 255;
+        if (r < 0) r = 0;
+        
+        int g = compound.getInteger("g", 0);
+        if (g > 255) r = 255;
+        if (g < 0) r = 0;
+        
+        int b = compound.getInteger("b", 0);
+        if (b > 255) r = 255;
+        if (b < 0) r = 0;
+        
+        return Color.fromRGB(r, g, b);
+    }
+    public Color getColor (String key, Color fallback) {
+        return (hasKey(key) ? getColor(key) : fallback);
+    }
 
     /**
      * Retrieves a byte value using the specified key, or 0 if no such key was stored.
@@ -279,12 +329,18 @@ public class StorageTagCompound extends StorageBase {
         }
         return 0;
     }
+    public byte getByte(String key, byte fallback) {
+        return (hasKey(key) ? getByte(key) : fallback);
+    }
 
     /**
      * Retrieves a short value using the specified key, or 0 if no such key was stored.
      */
     public short getShort(String key) {
         return Short.parseShort(getValue(key));
+    }
+    public short getShort(String key, short fallback) {
+        return (hasKey(key) ? getShort(key) : fallback);
     }
 
     /**
@@ -293,12 +349,18 @@ public class StorageTagCompound extends StorageBase {
     public int getInteger(String key) {
         return Integer.parseInt(getValue(key));
     }
+    public int getInteger(String key, int fallback) {
+        return (hasKey(key) ? getInteger(key) : fallback);
+    }
 
     /**
      * Retrieves a long value using the specified key, or 0 if no such key was stored.
      */
     public long getLong(String key) {
         return Long.parseLong(getValue(key));
+    }
+    public long getLong(String key, long fallback) {
+        return (hasKey(key) ? getLong(key) : fallback);
     }
 
     /**
@@ -307,6 +369,9 @@ public class StorageTagCompound extends StorageBase {
     public float getFloat(String key) {
         return Float.parseFloat(getValue(key));
     }
+    public float getFloat(String key, float fallback) {
+        return (hasKey(key) ? getFloat(key) : fallback);
+    }
 
     /**
      * Retrieves a double value using the specified key, or 0 if no such key was stored.
@@ -314,12 +379,18 @@ public class StorageTagCompound extends StorageBase {
     public double getDouble(String key) {
         return Double.parseDouble(getValue(key));
     }
+    public double getDouble(String key, double fallback) {
+        return (hasKey(key) ? getDouble(key) : fallback);
+    }
 
     /**
      * Retrieves a string value using the specified key, or an empty string if no such key was stored.
      */
     public String getString(String key) {
         return getValue(key);
+    }
+    public String getString(String key, String fallback) {
+        return (hasKey(key) ? getValue(key) : fallback);
     }
 
     public String getValue(String key) {
@@ -440,6 +511,9 @@ public class StorageTagCompound extends StorageBase {
      */
     public boolean getBoolean(String key) {
         return getByte(key) != 0;
+    }
+    public boolean getBoolean(String key, boolean fallback) {
+        return (hasKey(key) ? getBoolean(key) : fallback);
     }
 
     /**

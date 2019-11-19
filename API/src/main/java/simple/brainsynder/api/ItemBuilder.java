@@ -4,24 +4,22 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.material.MaterialData;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import simple.brainsynder.nbt.StorageTagCompound;
-import simple.brainsynder.nbt.StorageTagList;
-import simple.brainsynder.nbt.StorageTagString;
+import simple.brainsynder.nbt.*;
 import simple.brainsynder.nms.DataConverter;
 import simple.brainsynder.nms.materials.*;
+import simple.brainsynder.nms.materials.types.CoalType;
 import simple.brainsynder.nms.materials.types.*;
 import simple.brainsynder.reflection.FieldAccessor;
+import simple.brainsynder.utils.SkullType;
 import simple.brainsynder.utils.*;
 
 import java.util.*;
@@ -217,6 +215,13 @@ public class ItemBuilder {
             if (skull.containsKey("texture")) builder.setTexture(String.valueOf(skull.get("texture")));
             if (skull.containsKey("owner")) builder.setOwner(String.valueOf(skull.get("owner")));
         }
+        if (json.containsKey("color")) {
+            JSONObject colorJSON = (JSONObject) json.get("color");
+            int r = (int) colorJSON.getOrDefault("r", 0);
+            int g = (int) colorJSON.getOrDefault("g", 0);
+            int b = (int) colorJSON.getOrDefault("b", 0);
+            builder.withDyeColor(Color.fromRGB(r, g, b));
+        }
 
         return builder;
     }
@@ -258,6 +263,10 @@ public class ItemBuilder {
             if (!texture.isEmpty()) skull.setString("texture", texture);
 
             compound.setTag("skullData", skull);
+        }
+        if (im instanceof LeatherArmorMeta) {
+            LeatherArmorMeta meta = (LeatherArmorMeta) im;
+            compound.setColor("color", meta.getColor());
         }
         return compound;
     }
@@ -306,6 +315,7 @@ public class ItemBuilder {
             if (skull.hasKey("texture")) builder.setTexture(skull.getString("texture"));
             if (skull.hasKey("owner")) builder.setOwner(skull.getString("owner"));
         }
+        if (compound.hasKey("color")) builder.withDyeColor(compound.getColor("color"));
 
         return builder;
     }
@@ -317,6 +327,18 @@ public class ItemBuilder {
     public ItemBuilder withName(String name) {
         JSON.put("name", name);
         im.setDisplayName(translate(name));
+        return this;
+    }
+    public ItemBuilder withDyeColor(Color color) {
+        if (!is.getType().name().contains("LEATHER_")) return this;
+        JSONObject colorJSON = new JSONObject();
+        colorJSON.put("r", color.getRed());
+        colorJSON.put("g", color.getGreen());
+        colorJSON.put("b", color.getBlue());
+        JSON.put("color", colorJSON);
+        LeatherArmorMeta meta = (LeatherArmorMeta) im;
+        meta.setColor(color);
+        im = meta;
         return this;
     }
 
@@ -519,17 +541,23 @@ public class ItemBuilder {
                 if (mainMeta.hasEnchants() && checkMeta.hasEnchants()) {
                     values.add(mainMeta.getEnchants().equals(checkMeta.getEnchants()));
                 }
-
+    
                 if ((mainMeta instanceof SkullMeta) && (checkMeta instanceof SkullMeta)) {
                     SkullMeta mainSkullMeta = (SkullMeta) mainMeta;
                     SkullMeta checkSkullMeta = (SkullMeta) checkMeta;
-
+        
                     try { // This is just to ignore any NPE errors that might happen if using regular skulls
                         if (mainSkullMeta.hasOwner() && checkSkullMeta.hasOwner()) {
                             values.add(mainSkullMeta.getOwner().equals(checkSkullMeta.getOwner()));
                         }
                         values.add(getTexture(getGameProfile(mainSkullMeta)).equals(getTexture(getGameProfile(checkSkullMeta))));
                     }catch (Exception ignored) {}
+                }
+    
+                if ((mainMeta instanceof LeatherArmorMeta) && (checkMeta instanceof LeatherArmorMeta)) {
+                    LeatherArmorMeta mainColorMeta = (LeatherArmorMeta) mainMeta;
+                    LeatherArmorMeta checkColorMeta = (LeatherArmorMeta) checkMeta;
+                    values.add(mainColorMeta.getColor().asRGB() == checkColorMeta.getColor().asRGB());
                 }
 
                 DataConverter converter = Reflection.getConverter();
