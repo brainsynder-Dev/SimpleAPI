@@ -86,7 +86,12 @@ public class DataConverterHandler extends DataConverter {
         if (!(meta instanceof SpawnEggMeta)) return EntityType.UNKNOWN;
         return ((SpawnEggMeta)meta).getSpawnedType();
     }
-
+    
+    @Override
+    public boolean isSpawnEgg(ItemStack stack) {
+        return (stack.getType().name().contains("SPAWN_EGG"));
+    }
+    
     @Override
     public ItemStack getSpawnEgg(EntityType type, ItemStack stack) {
         Material material = findMaterial(type.name()+"_SPAWN_EGG");
