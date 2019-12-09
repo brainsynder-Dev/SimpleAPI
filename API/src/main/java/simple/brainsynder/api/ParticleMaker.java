@@ -365,34 +365,25 @@ public class ParticleMaker {
     public enum Particle {
         UNKNOWN(false, "", -1, ServerVersion.UNKNOWN),
         BARRIER(false, "barrier", 35, ServerVersion.v1_8_R3),
-        @Deprecated BLOCK_CRACK(true, "tilecrack_", 37, ServerVersion.v1_8_R3),
+        BLOCK_CRACK(true, "tilecrack_", 37, ServerVersion.v1_8_R3),
         BLOCK_DUST(true, "blockdust_", 38, ServerVersion.v1_8_R3),
-        BUBBLE_COLUMN_UP(false, "bubble_column_up", -1, ServerVersion.v1_13_R1), /* Added in 1.13 */
-        BUBBLE_POP(false, "bubble_pop", -1, ServerVersion.v1_13_R1), /* Added in 1.13 */
         CLOUD(false, "cloud", 29, ServerVersion.v1_8_R3),
         CRIT(false, "crit", 9, ServerVersion.v1_8_R3),
         CRIT_MAGIC(false, "magicCrit", 10, ServerVersion.v1_8_R3),
-        CURRENT_DOWN(false, "current_down", -1, ServerVersion.v1_13_R1), /* Added in 1.13 */
-        DAMAGE_INDICATOR(false, "damageIndicator", 44, ServerVersion.v1_9_R1),
-        DOLPHIN(false, "dolphin", -1, ServerVersion.v1_13_R1), /* Added in 1.13 */
-        DRAGON_BREATH(false, "dragonbreath", 42, ServerVersion.v1_9_R1),
         DRIP_LAVA(false, "dripLava", 19, ServerVersion.v1_8_R3),
         DRIP_WATER(false, "dripWater", 18, ServerVersion.v1_8_R3),
         ENCHANTMENT_TABLE(false, "enchantmenttable", 25, ServerVersion.v1_8_R3),
-        END_ROD(false, "endRod", 43, ServerVersion.v1_9_R1),
         EXPLOSION_HUGE(false, "hugeexplosion", 2, ServerVersion.v1_8_R3),
         EXPLOSION_LARGE(false, "largeexplode", 1, ServerVersion.v1_8_R3),
         EXPLOSION_NORMAL(false, "explode", 0, ServerVersion.v1_8_R3),
-        FALLING_DUST(false, "fallingdust", 46, ServerVersion.v1_10_R1),
         FIREWORKS_SPARK(false, "fireworksSpark", 3, ServerVersion.v1_8_R3),
         FLAME(false, "flame", 26, ServerVersion.v1_8_R3),
-        @Deprecated FOOTSTEP(false, "footstep", 28, ServerVersion.v1_8_R3, ServerVersion.v1_12_R1), // Removed in 1.13
+        @Deprecated FOOTSTEP(false, "footstep", 28, ServerVersion.v1_8_R3, ServerVersion.v1_12_R1),  /*  Was removed in 1.13 */
         HEART(false, "heart", 34, ServerVersion.v1_8_R3),
         ITEM_CRACK(true, "iconcrack_", 36, ServerVersion.v1_8_R3),
-        @Deprecated ITEM_TAKE(true, "take", 40, ServerVersion.v1_8_R3, ServerVersion.v1_12_R1), // Removed in 1.13
+        @Deprecated ITEM_TAKE(false, "take", 40, ServerVersion.v1_8_R3, ServerVersion.v1_12_R1),  /*  Was removed in 1.13 */
         LAVA(false, "lava", 27, ServerVersion.v1_8_R3),
         MOB_APPEARANCE(false, "mobappearance", 41, ServerVersion.v1_8_R3),
-        NAUTILUS(false, "nautilus", -1, ServerVersion.v1_13_R1), /* Added in 1.13 */
         NOTE(false, "note", 23, ServerVersion.v1_8_R3),
         PORTAL(false, "portal", 24, ServerVersion.v1_8_R3),
         REDSTONE(true, "reddust", 30, ServerVersion.v1_8_R3),
@@ -406,25 +397,80 @@ public class ParticleMaker {
         SPELL_MOB(false, "mobSpell", 15, ServerVersion.v1_8_R3),
         SPELL_MOB_AMBIENT(false, "mobSpellAmbient", 16, ServerVersion.v1_8_R3),
         SPELL_WITCH(false, "witchMagic", 17, ServerVersion.v1_8_R3),
-        SPIT(false, "spit", 48, ServerVersion.v1_11_R1),
-        SQUID_INK(false, "squid_ink", -1, ServerVersion.v1_13_R1), /* Added in 1.13 */
         SUSPENDED(false, "suspended", 7, ServerVersion.v1_8_R3),
         SUSPENDED_DEPTH(false, "depthsuspend", 8, ServerVersion.v1_8_R3),
-        SWEEP_ATTACK(false, "sweepAttack", 45, ServerVersion.v1_9_R1),
-        TOTEM(false, "totem", 47, ServerVersion.v1_11_R1),
         TOWN_AURA(false, "townaura", 22, ServerVersion.v1_8_R3),
         VILLAGER_ANGRY(false, "angryVillager", 20, ServerVersion.v1_8_R3),
         VILLAGER_HAPPY(false, "happyVillager", 21, ServerVersion.v1_8_R3),
         WATER_BUBBLE(false, "bubble", 4, ServerVersion.v1_8_R3),
         WATER_DROP(false, "droplet", 39, ServerVersion.v1_8_R3),
         WATER_SPLASH(false, "splash", 5, ServerVersion.v1_8_R3),
-        WATER_WAKE(false, "wake", 6, ServerVersion.v1_8_R3);
+        WATER_WAKE(false, "wake", 6, ServerVersion.v1_8_R3),
+
+
+        /* Added in 1.9 */
+        DAMAGE_INDICATOR(false, "damageIndicator", -1, ServerVersion.v1_9_R1),
+        DRAGON_BREATH(false, "dragonbreath", -1, ServerVersion.v1_9_R1),
+        END_ROD(false, "endRod", -1, ServerVersion.v1_9_R1),
+        SWEEP_ATTACK(false, "sweepAttack", -1, ServerVersion.v1_9_R1),
+
+
+        /* Added in 1.11 */
+        FALLING_DUST(true, "fallingdust", -1, ServerVersion.v1_11_R1),
+        SPIT(false, "spit", -1, ServerVersion.v1_11_R1),
+        TOTEM(false, "totem", -1, ServerVersion.v1_11_R1),
+
+
+        /* Added in 1.13 */
+        BUBBLE_COLUMN_UP(ServerVersion.v1_13_R1),
+        BUBBLE_POP(ServerVersion.v1_13_R1),
+        CURRENT_DOWN(ServerVersion.v1_13_R1),
+        DOLPHIN(ServerVersion.v1_13_R1),
+        @Deprecated LEGACY_BLOCK_CRACK(true, "legacy_block_crack", -1, ServerVersion.v1_13_R1),
+        @Deprecated LEGACY_BLOCK_DUST(true, "legacy_block_dust", -1, ServerVersion.v1_13_R1),
+        @Deprecated LEGACY_FALLING_DUST(true, "legacy_falling_dust", -1, ServerVersion.v1_13_R1),
+        NAUTILUS(ServerVersion.v1_13_R1),
+        SQUID_INK(ServerVersion.v1_13_R1),
+
+
+        /* Added in 1.14 */
+        CAMPFIRE_COSY_SMOKE(ServerVersion.v1_14_R1),
+        CAMPFIRE_SIGNAL_SMOKE(ServerVersion.v1_14_R1),
+        COMPOSTER(ServerVersion.v1_14_R1),
+        FALLING_LAVA(ServerVersion.v1_14_R1),
+        FALLING_WATER(ServerVersion.v1_14_R1),
+        FLASH(ServerVersion.v1_14_R1),
+        LANDING_LAVA(ServerVersion.v1_14_R1),
+        SNEEZE(ServerVersion.v1_14_R1),
+
+
+        /* Added in 1.15 */
+        DRIPPING_HONEY(ServerVersion.v1_15_R1),
+        FALLING_HONEY(ServerVersion.v1_15_R1),
+        LANDING_HONEY(ServerVersion.v1_15_R1),
+        FALLING_NECTAR(ServerVersion.v1_15_R1);
 
         private String name;
         private int id;
         private boolean requiresData;
         private ServerVersion version;
         private ServerVersion maxVersion;
+
+        Particle(ServerVersion version) {
+            this.name = name().toLowerCase();
+            this.id = -1;
+            this.requiresData=false;
+            this.version = version;
+            this.maxVersion = ServerVersion.UNKNOWN;
+        }
+
+        Particle(ServerVersion version, ServerVersion maxVersion) {
+            this.name = name().toLowerCase();
+            this.id = -1;
+            this.requiresData=false;
+            this.version = version;
+            this.maxVersion = maxVersion;
+        }
 
         Particle(boolean requiresData, String name, int id, ServerVersion version) {
             this.name = ((version == ServerVersion.v1_13_R1) ? name().toLowerCase() : name);
