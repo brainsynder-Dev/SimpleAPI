@@ -188,36 +188,15 @@ public class ParticleMaker {
     }
 
     public void sendToLocation(Location location) {
-        try {
-            Object packet = createPacket(location);
-            if (colored) {
-                for (int i = 0; i < repeatAmount; i++) {
-                    for (Player player : Bukkit.getOnlinePlayers()) {
-                        Reflection.sendPacket(player, packet);
-                    }
-                }
-                return;
+        location.getWorld().getNearbyEntities(location, 100, 100, 100).forEach(entity -> {
+            if (entity instanceof Player) {
+                sendToPlayer((Player) entity, location);
             }
-            for (Player player : Bukkit.getOnlinePlayers()) {
-                Reflection.sendPacket(player, packet);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     public void sendToPlayer(Player player) {
-        try {
-            Object packet = createPacket(player.getLocation());
-            if (colored) {
-                for (int i = 0; i < repeatAmount; i++) {
-                    Reflection.sendPacket(player, packet);
-                }
-                return;
-            }
-            Reflection.sendPacket(player, packet);
-        } catch (Exception ignored) {
-        }
+        sendToPlayer(player, player.getLocation());
     }
 
     public void sendToPlayer(Player player, Location location) {
@@ -253,7 +232,7 @@ public class ParticleMaker {
         } else if (type == Particle.REDSTONE) {
             if (dustOptions == null) dustOptions = new IParticleSender.DustOptions(Color.RED, 1);
 
-            if ((ServerVersion.getVersion().getIntVersion() >= ServerVersion.v1_13_R1.getIntVersion())) {
+            if (ServerVersion.isEqualNew(ServerVersion.v1_13_R1)) {
                 data = dustOptions;
             }else{
                 offsetX = getColor(dustOptions.getColor().getRed());
@@ -310,16 +289,6 @@ public class ParticleMaker {
 
     private static class Reflection {
         private static HashMap<Class<? extends Entity>, Method> handles = new HashMap<>();
-
-        public static Class<?> getNmsClass(String name) {
-            Class<?> clazz = null;
-            try {
-                clazz = Class.forName("net.minecraft.server." + getVersion() + "." + name);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            return clazz;
-        }
 
         public static String getVersion() {
             return Bukkit.getServer().getClass().getPackage().getName().substring(23);
@@ -488,6 +457,7 @@ public class ParticleMaker {
             this.maxVersion = maxVersion;
         }
 
+        @Deprecated
         public static Particle getById(int id) {
             if (id == -1) return UNKNOWN;
             for (Particle particle : values()) {
@@ -508,15 +478,6 @@ public class ParticleMaker {
             return UNKNOWN;
         }
 
-        public static Particle getByEnum(String name) {
-            if (name.isEmpty()) return UNKNOWN;
-            for (Particle particle : values()) {
-                if (particle.name().equals(name))
-                    return particle;
-            }
-            return UNKNOWN;
-        }
-
         public String getAllowedVersion() {
             String versionName = version.name();
             if (maxVersion != ServerVersion.UNKNOWN)
@@ -526,10 +487,11 @@ public class ParticleMaker {
 
         public boolean isCompatable() {
             if (maxVersion == ServerVersion.UNKNOWN) {
-                return (getVersion() <= ParticleMaker.version);
+                return ServerVersion.isEqualNew(version);
             }
             if (getVersion() <= ParticleMaker.version) {
-                return (maxVersion.getIntVersion() >= ParticleMaker.version);
+                // Particle was removed in a version and needs to be limited to what version can use it.
+                return ServerVersion.isEqualOld(maxVersion);
             }
             return true;
         }
