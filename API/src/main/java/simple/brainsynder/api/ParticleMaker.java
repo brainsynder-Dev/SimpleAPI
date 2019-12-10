@@ -478,6 +478,14 @@ public class ParticleMaker {
             return UNKNOWN;
         }
 
+        public ServerVersion getSupportedVersion () {
+            return version;
+        }
+
+        public ServerVersion getMaxVersion() {
+            return maxVersion;
+        }
+
         public String getAllowedVersion() {
             String versionName = version.name();
             if (maxVersion != ServerVersion.UNKNOWN)

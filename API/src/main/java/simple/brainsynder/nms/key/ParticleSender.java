@@ -8,17 +8,18 @@ import simple.brainsynder.utils.Reflection;
 import simple.brainsynder.utils.ServerVersion;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class ParticleSender implements IParticleSender<Object> {
     private Constructor<?> packetConstructor = null;
-    private boolean newParticlePacketConstructor = false;
+    private boolean newParticlePacketConstructor = false, newParticle = false;
     private Class<?> enumParticle = null;
 
     public ParticleSender () {
         try {
             Class<?> packetClass = Reflection.getNmsClass("PacketPlayOutWorldParticles");
-            if (ServerVersion.getVersion().getIntVersion() < ServerVersion.v1_8_R3.getIntVersion()) {
+            if (ServerVersion.isEqualOld(ServerVersion.v1_8_R3)) {
                 packetConstructor = packetClass.getConstructor(
                         String.class,
                         Float.TYPE,
@@ -30,8 +31,14 @@ public class ParticleSender implements IParticleSender<Object> {
                         Float.TYPE,
                         Integer.TYPE);
             } else {
+
                 newParticlePacketConstructor = true;
-                enumParticle = Reflection.getNmsClass("EnumParticle");
+                if (ServerVersion.isEqualNew(ServerVersion.v1_14_R1)) {
+                    enumParticle = Reflection.getNmsClass("Particles");
+                    newParticle = true;
+                }else{
+                    enumParticle = Reflection.getNmsClass("EnumParticle");
+                }
                 packetConstructor = packetClass.getDeclaredConstructor(
                         enumParticle,
                         Boolean.TYPE,
@@ -79,7 +86,19 @@ public class ParticleSender implements IParticleSender<Object> {
         try {
             Object packet;
             if (newParticlePacketConstructor) {
-                Object particleType = enumParticle.getEnumConstants()[type.getId()];
+                Object particleType = null;
+                if (newParticle) {
+                    for (Field field : enumParticle.getFields()) {
+                        if (field.getName().equalsIgnoreCase(type.name())) {
+                            particleType = field.get(null);
+                            break;
+                        }
+                    }
+                    if (particleType == null) throw new NullPointerException("Unable to find particle '"+type.name()+"' in Particles.java Field");
+                }else{
+                    particleType = enumParticle.getEnumConstants()[type.getId()];
+                }
+
                 packet = packetConstructor.newInstance(
                         particleType,
                         true,
