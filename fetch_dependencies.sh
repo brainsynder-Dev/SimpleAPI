@@ -6,6 +6,7 @@ wget https://archive.mcmirror.io/CraftBukkit/craftbukkit-1.9-R0.1-SNAPSHOT.jar -
 wget https://archive.mcmirror.io/CraftBukkit/craftbukkit-1.9.4-R0.1-SNAPSHOT.jar -P libs/
 wget https://archive.mcmirror.io/CraftBukkit/craftbukkit-1.10.2-R0.1-SNAPSHOT.jar -P libs/
 wget https://archive.mcmirror.io/CraftBukkit/craftbukkit-1.11.2-R0.1-SNAPSHOT.jar -P libs/
+wget https://pluginwiki.us/mcmirror/archive/craftbukkit-1.15-R0.1-SNAPSHOT.jar -P libs/
 
 wget https://archive.mcmirror.io/Spigot/spigot-1.12.2-R0.1-SNAPSHOT-b1648.jar -P libs/
 mv libs/spigot-1.12.2-R0.1-SNAPSHOT-b1648.jar libs/craftbukkit-1.12.2-R0.1-SNAPSHOT.jar
